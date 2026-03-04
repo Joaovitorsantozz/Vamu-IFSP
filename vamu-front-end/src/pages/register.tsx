@@ -5,6 +5,7 @@ import usericon from "../assets/icons/user.png";
 import emailicon from "../assets/icons/email.png";
 import passwordicon from "../assets/icons/password.png";
 import { Link } from 'react-router-dom';
+
 function Register() {
   return (
     <section className="register-section">
