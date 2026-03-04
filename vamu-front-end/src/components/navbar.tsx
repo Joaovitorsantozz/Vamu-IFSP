@@ -16,7 +16,7 @@ function Navbar() {
             <a href="/">Segurança</a>
           </li>
           <li>
-            <a href="/">Sobre nós</a>
+            <a href="/aboutUs">Sobre nós</a>
           </li>
         </ul>
       </div>
