@@ -1,4 +1,5 @@
 import logoimg from "../assets/icons/logo1.png";
+import { Link } from "react-router-dom";
 function Navbar() {
   return (
     <nav className="navbar">
@@ -22,8 +23,12 @@ function Navbar() {
       <div className="navbar-options">
         {/* Quem for mexer no front-end , estuda como transformar componentes, é melhor transformar esses botões em funções componentes que ai só
         repassa os parâmetros */}
-        <a className="login-btn">Entrar</a>
-        <a className="register-btn">Criar Conta</a>
+        <Link to="/login" className="login-btn">
+          Entrar
+        </Link>
+        <Link to="/register" className="register-btn">
+          Criar Conta
+        </Link>
       </div>
     </nav>
   );
