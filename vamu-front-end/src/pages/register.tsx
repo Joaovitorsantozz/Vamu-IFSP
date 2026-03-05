@@ -5,7 +5,8 @@ import usericon from "../assets/icons/user.png";
 import emailicon from "../assets/icons/email.png";
 import passwordicon from "../assets/icons/password.png";
 import { Link } from "react-router-dom";
-
+import * as yup from "yup";
+import Axios from "axios";
 function Register() {
   interface RegisterFormValues {
     name: string;
@@ -105,7 +106,7 @@ function Register() {
               Junte-se a maior comunidade acadêmica no país
             </p>
 
-            <Formik initialValues={{ email: "", password: "" }} onSubmit={() => { }}>
+            <Formik initialValues={{ name:" ",email: "", password: "" }} onSubmit={handleSubmit} validationSchema={validateRegister}>
               <Form className="flex flex-col gap-5">
                 <div className="w-full flex flex-col gap-2.5">
                   <label className="text-sm font-semibold text-[rgb(41,41,41)]">
