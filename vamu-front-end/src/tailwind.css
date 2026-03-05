@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-vamu-green: #11d473;
+  --color-vamu-green-light: #dff5ea;
+  --color-vamu-green-dark: #07b865;
+  --color-vamu-green-cta: #22c55e;
+  --color-vamu-dark: #080808;
+  --color-vamu-dark-deep: #062f1f;
+  --color-vamu-dark-green: #0b5d36;
+  --color-vamu-gray: #f5f7f9;
+  --color-vamu-gray-dark: #5f6b7a;
+  --color-vamu-gray-medium: #64748b;
+  --color-vamu-gray-light: #f1f1f1;
+  --color-vamu-border: #e6f2ec;
+  --color-vamu-card-bg: #f4f9f7;
+
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+}
+
+@layer base {
+  * {
+    word-spacing: 1.3px;
+  }
+}
