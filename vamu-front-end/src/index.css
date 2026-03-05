@@ -849,3 +849,9 @@ div.form-field {
   section.aboutUs footer{
     margin-top: 0;
   }
+
+  .error-message {
+    color: red;
+    font-size: 12px;
+  
+  }
