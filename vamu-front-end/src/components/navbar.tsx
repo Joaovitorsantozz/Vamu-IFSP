@@ -1,32 +1,48 @@
 import logoimg from "../assets/icons/logo1.png";
 import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <img src={logoimg} alt="Logo da Vamu" />
-        <h1>Vamu</h1>
+    <nav className="w-full h-[12vh] flex justify-between items-center px-4 md:px-[4%]">
+      {/* Logo — sempre visível */}
+      <div className="flex items-center gap-[5px]">
+        <img className="w-8 md:w-10" src={logoimg} alt="Logo da Vamu" />
+        <h1 className="text-xl md:text-[30px] font-medium text-[#151515]">Vamu</h1>
       </div>
-      <div className="navbar-list">
-        <ul>
-          <li>
-            <a href="/">Como Funciona</a>
+
+      {/* Nav links — escondidos no mobile, visíveis no desktop */}
+      <div className="hidden lg:flex h-full">
+        <ul className="flex gap-8 h-full list-none items-center">
+          <li className="hover:border-b-[3px] hover:border-vamu-green hover:pb-[1px]">
+            <a className="no-underline text-vamu-dark text-base font-medium" href="/">
+              Como Funciona
+            </a>
           </li>
-          <li>
-            <a href="/">Segurança</a>
+          <li className="hover:border-b-[3px] hover:border-vamu-green hover:pb-[1px]">
+            <a className="no-underline text-vamu-dark text-base font-medium" href="/">
+              Segurança
+            </a>
           </li>
-          <li>
-            <a href="/aboutUs">Sobre nós</a>
+          <li className="hover:border-b-[3px] hover:border-vamu-green hover:pb-[1px]">
+            <a className="no-underline text-vamu-dark text-base font-medium" href="/aboutUs">
+              Sobre nós
+            </a>
           </li>
         </ul>
       </div>
-      <div className="navbar-options">
-        {/* Quem for mexer no front-end , estuda como transformar componentes, é melhor transformar esses botões em funções componentes que ai só
-        repassa os parâmetros */}
-        <Link to="/login" className="login-btn">
+
+      {/* Botões — menores no mobile */}
+      <div className="flex items-center gap-2 md:gap-[5%]">
+        <Link
+          to="/login"
+          className="text-vamu-green bg-vamu-green-light px-3 py-2 md:px-[26px] md:py-[15px] font-semibold text-xs md:text-sm rounded-[10px] no-underline"
+        >
           Entrar
         </Link>
-        <Link to="/register" className="register-btn">
+        <Link
+          to="/register"
+          className="bg-vamu-green text-vamu-dark px-3 py-2 md:px-[26px] md:py-[15px] font-semibold text-xs md:text-sm rounded-[10px] no-underline"
+        >
           Criar Conta
         </Link>
       </div>
