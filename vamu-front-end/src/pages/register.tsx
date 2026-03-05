@@ -153,7 +153,7 @@ function Register() {
                     <Field
                       className="flex-1 h-full bg-[rgb(248,248,248)] border-none outline-none text-sm"
                       name="password"
-                      type="text"
+                      type="password"
                       placeholder="Digite seu senha"
                     />
                   </div>
@@ -195,7 +195,7 @@ function Register() {
             </p>
           </div>
 
-          <Formik initialValues={{ email: "", password: "" }} onSubmit={() => { }}>
+          <Formik initialValues={{ name: "", email: "", password: "" }} onSubmit={handleSubmit} validationSchema={validateRegister}>
             <Form className="w-full px-[15%] flex flex-col gap-5">
               <div className="w-full flex flex-col gap-2.5">
                 <label className="text-sm font-semibold text-[rgb(41,41,41)]">
