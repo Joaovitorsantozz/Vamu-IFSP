@@ -4,10 +4,11 @@ import { Formik, Form, Field } from "formik";
 import usericon from "../assets/icons/user.png";
 import emailicon from "../assets/icons/email.png";
 import passwordicon from "../assets/icons/password.png";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import Axios from "axios";
 function Register() {
+   const navigate= useNavigate();
   interface RegisterFormValues {
     name: string;
     email: string;
@@ -32,6 +33,7 @@ function Register() {
     })
       .then((response) => {
         alert(response.data.message);
+        navigate("/login");
       })
       .catch((error) => {
         console.error("Erro ao registrar usuário:", error);

@@ -41,7 +41,7 @@ function Navbar() {
         </Link>
         <Link
           to="/register"
-          className="bg-vamu-green text-vamu-dark px-3 py-2 md:px-[26px] md:py-[15px] font-semibold text-xs md:text-sm rounded-[10px] no-underline"
+          className="whitespace-nowrap bg-vamu-green text-vamu-dark px-3 py-2 md:px-[32px] md:py-[15px] font-semibold text-xs md:text-sm rounded-[10px] no-underline"
         >
           Criar Conta
         </Link>
