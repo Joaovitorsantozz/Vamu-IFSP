@@ -1,0 +1,1 @@
+Vamu é um projeto universitário que está sendo desenvolvido pela turma do 3º semestre de Ciência da Computação do IFSP Salto, a ideia é criar um ambiente que facilite o deslocamento de alunos de outras cidades, através de um sistema de cadastro de caronas
