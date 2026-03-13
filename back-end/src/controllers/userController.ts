@@ -1,5 +1,10 @@
 import bcrypt from "bcrypt";
-import { registerUser, loginUser } from "../services/userService.js";
+import {
+  registerUser,
+  loginUser,
+  registerAboutUserService,
+  getUserSerivce,
+} from "../services/userService.js";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -71,5 +76,65 @@ export async function userlogin(req: Request, res: Response) {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Erro ao logar usuário", err });
+  }
+}
+
+export async function registerAboutUser(req: Request, res: Response) {
+  try {
+    const { idade, semestre, curso, telefone, localidade, descricao } =
+      req.body;
+    const validFields = [
+      idade,
+      semestre,
+      curso,
+      telefone,
+      localidade,
+      descricao,
+    ].filter((field) => field !== undefined);
+
+    if (validFields.length === 0) {
+      return res.status(400).json({ message: "Nenhum campo para atualizar" });
+    }
+    const userId = (req as any).user.userId;
+    const result = await registerAboutUserService(
+      idade,
+      curso,
+      semestre,
+      telefone,
+      localidade,
+      descricao,
+      userId,
+    );
+    if (!result) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+    res
+      .status(200)
+      .json({ message: "Informações atualizadas com sucesso", result });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ message: "Erro ao atualizar informações do usuário", err });
+  }
+}
+
+export async function getUserInformation(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.userId;
+    const user = await getUserSerivce(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+    delete user.senha;
+    return res.json({
+      message: "Informações do usuário obtidas com sucesso",
+      user,
+    });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ message: "Erro ao obter informações do usuário", err });
   }
 }

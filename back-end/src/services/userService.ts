@@ -26,3 +26,37 @@ export async function loginUser(email: string) {
     throw error;
   }
 }
+export async function registerAboutUserService(
+  idade: number | null,
+  curso: string | null,
+  semestre: number | null,
+  telefone: string | null,
+  localidade: string | null,
+  descricao: string | null,
+  id: number,
+) {
+  const sql = `
+    UPDATE users
+    SET age = COALESCE($1, age),
+        course = COALESCE($2, course),
+        semester = COALESCE($3, semester),
+        phone_number = COALESCE($4, phone_number),
+        city = COALESCE($5, city),
+        description = COALESCE($6, description)
+    WHERE id = $7
+    RETURNING *
+  `;
+
+  const values = [idade, curso, semestre, telefone, localidade, descricao, id];
+
+  const result = await pool.query(sql, values);
+
+  return result.rows[0];
+}
+
+
+export async function getUserSerivce(userId:number){
+  const sql = "SELECT * FROM users WHERE id=$1";
+  const { rows } = await pool.query(sql, [userId]);
+  return rows[0];
+}
