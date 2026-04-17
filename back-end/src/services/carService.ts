@@ -28,3 +28,4 @@ export async function getCarInformationService(userId:number){
     }
     return rows[0];
 }
+

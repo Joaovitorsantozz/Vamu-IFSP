@@ -55,8 +55,22 @@ export async function registerAboutUserService(
 }
 
 
-export async function getUserSerivce(userId:number){
+export async function getUserSerivce(userId:number) {
+  //basicamente só pra tela de perfil, PUXA TODAS AS INFOS
   const sql = "SELECT * FROM users WHERE id=$1";
+  const { rows } = await pool.query(sql, [userId]);
+  return rows[0];
+}
+
+export async function getFilteredUserInformationService(userId: number,fields?: string[]) {
+  // quando quiser uma informação em especifico
+  const allowedFields=["id", "nome", "email","senha", "age", "course", "semester", "phone_number", "city", "description"];
+  let selectedFields = "*";
+  if (fields && fields.length > 0) {
+   const validFields = fields.filter(field => allowedFields.includes(field));
+   selectedFields = validFields.length > 0 ? validFields.join(", ") : "*";
+  } 
+  const sql = `SELECT ${selectedFields} FROM users WHERE id=$1`;
   const { rows } = await pool.query(sql, [userId]);
   return rows[0];
 }
