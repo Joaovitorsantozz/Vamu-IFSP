@@ -7,6 +7,7 @@ import UserLogin from "./pages/login";
 import ProtectedRoute from "./features/protectedRoute";
 import Dashboard from "./pages/dashboard";
 import RidePage from "./pages/ridePage";
+import HasCarProtectedRoute from "./features/hasCarProtectedRoute";
 function App() {
   return (
     <Routes>
@@ -26,7 +27,9 @@ function App() {
         path="/offer-ride"
         element={
           <ProtectedRoute>
-            <RidePage />
+            <HasCarProtectedRoute>
+              <RidePage />
+            </HasCarProtectedRoute>
           </ProtectedRoute>
         }
       ></Route>

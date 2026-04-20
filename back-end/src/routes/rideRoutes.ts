@@ -1,6 +1,6 @@
 import express from "express";
 
-import { registerRide,getDriverInformations } from "../controllers/rideController.js";
+import { registerRide,getDriverInformations, getDriverRaceInformations, deleteRide } from "../controllers/rideController.js";
 import { AuthenticateToken } from "../middlewares/authenticateToken.js";
 
 const router = express.Router();
@@ -10,4 +10,6 @@ const router = express.Router();
 
 router.post("/offer-ride", AuthenticateToken,registerRide);
 router.get("/get-user-information-to-offer-ride",AuthenticateToken,getDriverInformations);
+router.get("/my-races-as-driver",AuthenticateToken,getDriverRaceInformations);
+router.delete("/delete-race/:rideId",AuthenticateToken,deleteRide);
 export default router;

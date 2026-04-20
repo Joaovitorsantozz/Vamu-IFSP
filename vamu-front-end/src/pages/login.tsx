@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { validateLogin } from "../validations/loginSchema";
 import { loginUser } from "../service/authservice";
 import LoginForm from "../features/authentication/loginForm";
+import { useContext } from "react";
+import { UserContext } from "../context/userContext";
 
 function Login() {
   const navigate = useNavigate();
@@ -13,12 +15,15 @@ function Login() {
     email: string;
     password: string;
   }
-
+   const { resetUser,setToken } = useContext(UserContext);
   const handleSubmit = async (values: LoginFormValues) => {
     try {
+  
+      resetUser();
       const response = await loginUser(values);
       const token = response.data.token;
       localStorage.setItem("token", token);
+      setToken(token);
       alert(response.data.message);
       navigate("/dashboard");
     } catch (err) {

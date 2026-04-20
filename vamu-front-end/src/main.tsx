@@ -4,11 +4,14 @@ import { BrowserRouter } from "react-router-dom";
 import "./tailwind.css";
 import "./index.css";
 import App from "./App.tsx";
+import { UserProvider } from "./context/userContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <UserProvider>
+        <App />
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>,
 );

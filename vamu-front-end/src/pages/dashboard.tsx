@@ -1,6 +1,4 @@
-
 import {
-
   MapPin,
   GraduationCap,
   Calendar,
@@ -13,11 +11,43 @@ import Logo from "../assets/icons/logo1.png";
 import User from "../assets/icons/user.png";
 import BellNotification from "../assets/icons/bellnotifications.png";
 import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../context/userContext";
+import { getRacesAsDriver } from "../service/rideOfferService";
+import { RideCard } from "../components/ridecard";
+type Ride = {
+  id: number;
+  boarding: string;
+
+  destination: string;
+  boarding_time: string;
+  is_active: boolean;
+  passengers_count: number;
+};
 const VamuDashboard = () => {
+  const { car } = useContext(UserContext);
+  const token = localStorage.getItem("token");
+  const [rideAsDriver, setRideAsDriver] = useState<Ride[]>([]);
+  async function fetchData() {
+    try {
+      if (!token) return;
+      const response = await getRacesAsDriver(token);
+      setRideAsDriver(
+        Array.isArray(response.data.result)
+          ? response.data.result
+          : [response.data.result],
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    fetchData();
+  }, [token]);
+
   return (
-    /* Alterado para font-jakarta e text-vamu-dark */
     <div className="min-h-screen bg-vamu-gray font-jakarta text-vamu-dark">
-      {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-vamu-border">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center">
@@ -55,7 +85,6 @@ const VamuDashboard = () => {
       </nav>
 
       <main className="max-w-5xl mx-auto pt-12 pb-20 px-6">
-        {/* Header Hero */}
         <section className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-vamu-dark mb-3 tracking-tight">
             Para onde vamos hoje?
@@ -66,7 +95,6 @@ const VamuDashboard = () => {
           </p>
         </section>
 
-        {/* Search Card */}
         <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 mb-16 border border-vamu-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="relative">
@@ -123,7 +151,6 @@ const VamuDashboard = () => {
           </div>
         </section>
 
-        {/* Active Rides */}
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="flex items-center gap-2 font-bold text-vamu-dark text-lg">
@@ -133,83 +160,30 @@ const VamuDashboard = () => {
               Ver todas
             </button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Card Passenger */}
-            <div className="bg-white p-5 rounded-2xl border border-vamu-border shadow-sm relative overflow-hidden">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className="text-[10px] font-bold text-vamu-gray-dark uppercase tracking-wider block">
-                    VOCÊ É PASSAGEIRO
-                  </span>
-                  <h3 className="font-bold text-vamu-dark">USP - Portão 1</h3>
-                </div>
-                <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
-                  ATIVA
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-vamu-gray-dark text-sm mb-6">
-                <Clock className="w-4 h-4" /> <span>Hoje às 18:30</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-vamu-gray-light rounded-full border border-white"></div>
-                  <span className="text-xs text-vamu-gray-dark font-medium">
-                    Marcos S. (Motorista)
-                  </span>
-                </div>
-                <button className="text-[11px] font-bold bg-vamu-gray text-vamu-gray-dark px-3 py-1.5 rounded-lg border border-vamu-border">
-                  Detalhes
-                </button>
-              </div>
-            </div>
+            {rideAsDriver.map((ride) => (
+              <RideCard key={ride?.id} ride={ride} onUpdate={fetchData}/>
+            ))}
 
-            {/* Card Driver */}
-            <div className="bg-white p-5 rounded-2xl border border-vamu-border shadow-sm relative overflow-hidden">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className="text-[10px] font-bold text-vamu-gray-dark uppercase tracking-wider block">
-                    VOCÊ É MOTORISTA
-                  </span>
-                  <h3 className="font-bold text-vamu-dark">
-                    Estação Pinheiros
-                  </h3>
-                </div>
-                <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
-                  ATIVA
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-vamu-gray-dark text-sm mb-6">
-                <Clock className="w-4 h-4" /> <span>Amanhã às 07:15</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex -space-x-2">
-                  <div className="w-7 h-7 bg-vamu-gray-light rounded-full border-2 border-white"></div>
-                  <div className="w-7 h-7 bg-vamu-gray-medium rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold text-white">
-                    +1
-                  </div>
-                </div>
-                <button className="text-[11px] font-bold bg-vamu-gray text-vamu-gray-dark px-3 py-1.5 rounded-lg border border-vamu-border">
-                  Gerenciar
-                </button>
-              </div>
-            </div>
-
-            {/* Offer Ride Dotted Box */}
             <div className="border-2 border-dashed border-vamu-green/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center hover:bg-vamu-green-light/50 transition cursor-pointer group">
               <p className="text-vamu-dark-green font-semibold text-sm mb-1">
                 Vai sair de carro?
               </p>
-              <Link to="/offer-ride">
-              <p className="text-vamu-green-dark font-black text-xs uppercase tracking-widest underline decoration-2 underline-offset-4 group-hover:text-vamu-green-cta">
-                Oferecer nova carona
-              </p>
-              </Link>
+              {car ? (
+                <Link to="/offer-ride">
+                  <p className="text-vamu-green-dark font-black text-xs uppercase tracking-widest underline decoration-2 underline-offset-4 group-hover:text-vamu-green-cta">
+                    Oferecer nova carona
+                  </p>
+                </Link>
+              ) : (
+                <p className="text-vamu-gray-dark font-black text-xs uppercase tracking-widest opacity-50 cursor-not-allowed">
+                  Cadastre um carro para oferecer caronas
+                </p>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Recent Rides Table */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <Clock className="w-5 h-5 text-vamu-gray-dark" />
@@ -276,7 +250,6 @@ const VamuDashboard = () => {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="max-w-5xl mx-auto px-6 py-10 border-t border-vamu-border flex flex-wrap justify-between items-center gap-6">
         <div className="flex items-center gap-2 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition">
           <img src={Logo} alt="VAMU Logo" className="w-6 h-6" />

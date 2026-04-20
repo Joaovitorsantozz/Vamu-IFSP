@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Logo from "../assets/icons/logo1.png";
 import UserIcon from "../assets/icons/user.png";
 import BellNotification from "../assets/icons/bellnotifications.png";
-import RideForm from "../features/ridePageForm";
+import RideForm from "../features/authentication/ridePageForm";
 
 const RidePage = () => {
   return (

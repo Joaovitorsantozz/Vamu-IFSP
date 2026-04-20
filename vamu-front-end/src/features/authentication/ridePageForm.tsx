@@ -1,55 +1,22 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Car, Route, MapPin, Clock, Send, ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { getDriverInfo, offerRideSubmit } from "../service/rideOfferService";
-import { rideSchema } from "../validations/rideOfferSchema";
+import { Link, useNavigate } from "react-router-dom";
+import { getDriverInfo, offerRideSubmit } from "../../service/rideOfferService";
+import { rideSchema } from "../../validations/rideOfferSchema";
+import { UserContext } from "../../context/userContext";
 const RideForm = () => {
   const navigate = useNavigate();
 
-  const [initialValues, setInitialValues] = useState({
-    ownerName: "",
-    carPlate: "",
-    carModel: "",
-    carColor: "",
-    departureLocation: "",
-    meetingCity: "",
-    departureTime: "",
-  });
-  const token = localStorage.getItem("token");
- useEffect(() => {
- 
-
-  async function fetchData() {
-    if (!token) return;
-    try {
-      const response = await getDriverInfo(token);
-
-      const { user, car } = response.data;
-
-      setInitialValues({
-        ownerName: user?.nome || "",
-        carPlate: car?.placa || "",
-        carModel: car?.modelo || "",
-        carColor: car?.cor || "",
-        departureLocation: "",
-        meetingCity: "",
-        departureTime: "",
-      });
-    } catch (error) {
-      console.log("erro no fetch das informações do motorista", error);
-    }
-  }
-
-  fetchData();
-}, [token]);
+  const { user, car } = useContext(UserContext);
 
   const handleSubmit = async (values: any) => {
     const payload = {
-      boarding: values.departureLocation,
-      destination: values.meetingCity,
-      boardingTime: values.departureTime,
+      boarding: values.boarding,
+      destination: values.destination,
+      boardingTime: values.boarding_time,
     };
+    console.log(values);
     try {
       const response = await offerRideSubmit(payload);
       alert(response?.data.message);
@@ -58,18 +25,29 @@ const RideForm = () => {
       const message =
         error?.response?.data?.message || "Erro ao registrar carona";
       alert(message);
+
     }
   };
 
   const inputStyle =
     "w-full bg-vamu-gray border border-vamu-border rounded-xl p-4 focus:ring-2 focus:ring-vamu-green/20 focus:border-vamu-green outline-none text-vamu-dark font-medium transition-all";
+  if (!user || !car) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={{
+        ownerName: user.nome,
+        carPlate: car.placa,
+        carModel: car.modelo,
+        carColor: car.cor,
+        boarding: "",
+        destination: "",
+        boarding_time: "",
+      }}
       onSubmit={handleSubmit}
       validationSchema={rideSchema}
-      enableReinitialize={true}
     >
       {() => (
         <Form className="space-y-8">
@@ -143,6 +121,7 @@ const RideForm = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-6 relative z-10">
+              {/* SAÍDA */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
                   Local de Saída
@@ -150,12 +129,12 @@ const RideForm = () => {
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-vamu-green-dark w-5 h-5" />
                   <Field
-                    name="departureLocation"
+                    name="boarding"
                     placeholder="Ex: Campus Central - Bloco A"
                     className={`${inputStyle} pl-12`}
                   />
                   <ErrorMessage
-                    name="departureLocation"
+                    name="boarding"
                     component="span"
                     className="text-red-500 text-xs"
                   />
@@ -163,38 +142,41 @@ const RideForm = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* DESTINO */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
-                    Cidade de Encontro
+                    Destino
                   </label>
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-vamu-green-dark w-5 h-5" />
                     <Field
-                      name="meetingCity"
+                      name="destination"
                       placeholder="Ex: São Paulo"
                       className={`${inputStyle} pl-12`}
                     />
                     <ErrorMessage
-                      name="meetingCity"
+                      name="destination"
                       component="span"
                       className="text-red-500 text-xs"
                     />
                   </div>
                 </div>
 
+                {/* DATA */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
-                    Horário de Saída
+                    Data e horário de saída
                   </label>
+
                   <div className="relative">
                     <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-vamu-green-dark w-5 h-5" />
                     <Field
-                      name="departureTime"
-                      type="time"
+                      name="boarding_time"
+                      type="datetime-local"
                       className={`${inputStyle} pl-12`}
                     />
                     <ErrorMessage
-                      name="departureTime"
+                      name="boarding_time"
                       component="span"
                       className="text-red-500 text-xs"
                     />
@@ -205,12 +187,13 @@ const RideForm = () => {
           </section>
 
           <div className="flex flex-col md:flex-row items-center justify-end gap-4 mt-12">
-            <button
-              type="button"
+            <Link
+              to="/dashboard"
               className="w-full md:w-auto px-8 py-4 text-vamu-gray-dark font-bold hover:text-vamu-dark transition-colors duration-200"
             >
               Cancelar
-            </button>
+            </Link>
+
             <button
               type="submit"
               className="w-full md:w-auto bg-vamu-green-cta text-white font-bold py-4 px-12 rounded-2xl shadow-xl shadow-vamu-green/20 hover:bg-vamu-green-dark hover:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
