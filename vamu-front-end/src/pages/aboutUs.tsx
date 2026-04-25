@@ -97,7 +97,7 @@ function AboutUs() {
                 </section>
 
                 {/* Convite */}
-                <section className="bg-[rgb(242,242,242)] mt-0 p-8 lg:p-16">
+                <section className=" mt-0 p-8 lg:p-16">
                     <div className="flex mx-auto mt-0 justify-center items-center w-full lg:w-[80%]">
                         <div className="bg-[#030d2c] rounded-2xl lg:rounded-[3rem] text-center p-6 lg:p-8 w-full">
                             <h2 className="mx-auto my-4 text-center w-full lg:w-[80%] text-2xl md:text-[2rem] lg:text-[3rem] font-extrabold text-white">
