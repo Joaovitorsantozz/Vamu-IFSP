@@ -8,6 +8,8 @@ import ProtectedRoute from "./features/protectedRoute";
 import Dashboard from "./pages/dashboard";
 import RidePage from "./pages/ridePage";
 import HasCarProtectedRoute from "./features/hasCarProtectedRoute";
+import DriverManageRide from "./pages/driverRideDetails";
+import UserProf from "./pages/userProfile";
 function App() {
   return (
     <Routes>
@@ -33,6 +35,23 @@ function App() {
           </ProtectedRoute>
         }
       ></Route>
+      <Route
+        path="/manage-ride/:rideid"
+        element={
+          <ProtectedRoute>
+            <DriverManageRide></DriverManageRide>
+          </ProtectedRoute>
+        }
+      ></Route>
+      <Route
+        path="/my-profile"
+        element={
+          <ProtectedRoute>
+            <UserProf></UserProf>
+          </ProtectedRoute>
+        }
+      ></Route>
+      
     </Routes>
   );
 }

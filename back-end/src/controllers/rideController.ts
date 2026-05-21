@@ -6,13 +6,13 @@ import {
   getDriverRaceInformationsService,
   getRideById,
   offerRide,
+  updateRaceStatusService,
 } from "../services/rideService.js";
 import { getFilteredUserInformationService } from "../services/userService.js";
 
 export async function registerRide(req: Request, res: Response) {
   try {
     const user = (req as any).user;
-    console.log("USER", user);
 
     const { nome } = await getFilteredUserInformationService(user.userId, [
       "nome",
@@ -103,7 +103,21 @@ export async function getDriverRaceInformations(req: Request, res: Response) {
     .status(201)
     .json({ message: "Suas caronas como motorista active==true", result });
 }
+export async function getRideByIdController(req: Request, res: Response) {
+  try {
+    const rideId = Number(req.params.rideId);
+    if (!rideId) {
+      res.status(404).json({ message: "ID da corrida não fornecido" });
+    }
 
+    const result = getRideById(rideId);
+    if (!result)
+      return res.status(404).json({ message: "Corrida não encontrada" });
+    return res.status(201).json({ message: "Corrida encontrada", result });
+  } catch (error) {
+    console.log("Erro ao buscar carona por id", error);
+  }
+}
 export async function deleteRide(req: Request, res: Response) {
   try {
     const userId = (req as any).user.userId;
@@ -125,5 +139,35 @@ export async function deleteRide(req: Request, res: Response) {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Erro ao deletar carona" });
+  }
+}
+
+export async function updateStatus(req: Request, res: Response) {
+  try {
+    const ownerId = (req as any).user.userId;
+    const { userId } = req.body;
+    const rideId = Number(req.params.rideId);
+    if (!userId || !rideId)
+      return res.status(404).json({ message: "Sem userid ou rideid" });
+    const ride = await getRideById(rideId);
+    const { status } = req.body;
+
+    if (Number(ride.user_id) !== Number(ownerId)) {
+      return res.status(403).json({ message: "Sem permissão para deletar" });
+    }
+
+    if (status != "accepted" && status != "rejected") {
+  
+      return res.status(400).json({ message: "Status não tolerado" });
+    }
+    await updateRaceStatusService(status, Number(rideId), Number(userId));
+    return res
+      .status(200)
+      .json({ message: "Status do passageiro atualizado com sucesso" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Erro ao alterar status da corrida" });
   }
 }

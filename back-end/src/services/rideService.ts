@@ -84,3 +84,17 @@ export async function deleteRaceService(params: {
   const query = `DELETE FROM offered_rides WHERE id=$1 AND user_id=$2`;
   return await pool.query(query, [rideId, userId]);
 }
+
+export async function updateRaceStatusService(
+  status: string,
+  ride_id: number,
+  user_id: number,
+) {
+  console.log("status service",status);
+  console.log("ride",ride_id);
+  console.log("userid",user_id);
+  const query = `UPDATE ride_passengers SET status = $1 WHERE user_id = $2 AND ride_id = $3;`;
+  const result = await pool.query(query, [status, user_id, ride_id]);
+  console.log(result.rowCount);
+  return result.rows[0];
+}

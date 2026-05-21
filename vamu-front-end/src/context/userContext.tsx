@@ -7,11 +7,21 @@ export const UserContext = createContext<any>(null);
 export const UserProvider = ({ children }: any) => {
   const [user, setUser] = useState(null);
   const [car, setCar] = useState(null);
-  const [token,setToken]=useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   const resetUser = () => {
     setUser(null);
     setCar(null);
+  };
+  const fetchUser = async () => {
+    if (!token) return;
+    try {
+      const response = await getDriverInfo(token);
+      setUser(response.data.user);
+      setCar(response.data.car);
+    } catch (error) {
+      console.log("Erro ao buscar user global", error);
+    }
   };
   useEffect(() => {
     async function fetchUser() {
@@ -27,7 +37,7 @@ export const UserProvider = ({ children }: any) => {
     fetchUser();
   }, [token]);
   return (
-    <UserContext.Provider value={{ user, car, resetUser,setToken}}>
+    <UserContext.Provider value={{ user, car, resetUser, setToken ,fetchUser}}>
       {children}
     </UserContext.Provider>
   );

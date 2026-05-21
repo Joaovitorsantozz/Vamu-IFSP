@@ -37,7 +37,7 @@ const VamuDashboard = () => {
           ? response.data.result
           : [response.data.result],
       );
-      console.log(response);
+ 
     } catch (error) {
       console.log(error);
     }
@@ -78,7 +78,7 @@ const VamuDashboard = () => {
               </div>
             </div>
             <div className="w-8 h-8 border-2 border-vamu-green rounded-full flex items-center justify-center">
-              <img src={User} alt="Perfil do usuário" className="w-5 h-5" />
+              <Link to ="/my-profile"><img src={User} alt="Perfil do usuário" className="w-5 h-5" /></Link>
             </div>
           </div>
         </div>

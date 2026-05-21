@@ -49,3 +49,16 @@ export const deleteRide = (raceid: number) => {
     },
   });
 };
+
+export const getRideById = (id: number) => {
+  const token = localStorage.getItem("token");
+   if (!token) {
+    alert("Usuário não autenticado");
+    return;
+  }
+  return Axios.get(`${API_URL}/get-ride-by-id/${id}`,{
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
+  });
+};
