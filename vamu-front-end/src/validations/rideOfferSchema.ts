@@ -12,4 +12,6 @@ export const rideSchema = Yup.object().shape({
   boarding_time: Yup.date()
     .required("Data e horário são obrigatórios")
     .typeError("Formato inválido"),
+
+  
 });

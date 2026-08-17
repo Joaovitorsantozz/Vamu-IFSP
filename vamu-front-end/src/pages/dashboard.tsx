@@ -15,6 +15,9 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
 import { getRacesAsDriver } from "../service/rideOfferService";
 import { RideCard } from "../components/ridecard";
+import { Formik, Form } from "formik";
+import { fetchBrazilianCities } from "../service/ibgeAPIcities";
+import AsyncSelect from "react-select/async";
 type Ride = {
   id: number;
   boarding: string;
@@ -28,6 +31,50 @@ const VamuDashboard = () => {
   const { car } = useContext(UserContext);
   const token = localStorage.getItem("token");
   const [rideAsDriver, setRideAsDriver] = useState<Ride[]>([]);
+  const handleSubmit = () => {};
+  const selectStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "transparent",
+      border: "none",
+      boxShadow: "none",
+      minHeight: "auto",
+      cursor: "text",
+      width: "100%",
+      padding: 0,
+      "&:hover": {
+        border: "none",
+      },
+    }),
+    valueContainer: (provided: any) => ({
+      ...provided,
+      padding: "0px",
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      margin: 0,
+      padding: 0,
+      color: "#1E293B",
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      margin: 0,
+      color: "#94A3B8",
+      fontSize: "0.875rem",
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      margin: 0,
+      color: "#1E293B",
+    }),
+    indicatorsContainer: () => ({
+      display: "none",
+    }),
+    menuPortal: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+    }),
+  };
   async function fetchData() {
     try {
       if (!token) return;
@@ -37,7 +84,6 @@ const VamuDashboard = () => {
           ? response.data.result
           : [response.data.result],
       );
- 
     } catch (error) {
       console.log(error);
     }
@@ -78,7 +124,9 @@ const VamuDashboard = () => {
               </div>
             </div>
             <div className="w-8 h-8 border-2 border-vamu-green rounded-full flex items-center justify-center">
-              <Link to ="/my-profile"><img src={User} alt="Perfil do usuário" className="w-5 h-5" /></Link>
+              <Link to="/my-profile">
+                <img src={User} alt="Perfil do usuário" className="w-5 h-5" />
+              </Link>
             </div>
           </div>
         </div>
@@ -96,59 +144,141 @@ const VamuDashboard = () => {
         </section>
 
         <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 mb-16 border border-vamu-border">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="relative">
-              <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
-                Saindo de
-              </label>
-              <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
-                <MapPin className="text-vamu-green-dark w-5 h-5 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Ex: Estação Butantã"
-                  className="bg-transparent w-full outline-none text-vamu-dark"
-                />
-              </div>
-            </div>
-            <div className="relative">
-              <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
-                Indo para
-              </label>
-              <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
-                <GraduationCap className="text-vamu-green-dark w-5 h-5 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Ex: Portão 3 USP"
-                  className="bg-transparent w-full outline-none text-vamu-dark"
-                />
-              </div>
-            </div>
-          </div>
+          <Formik
+            initialValues={{
+              cityBoarding: "",
+              cityDestination: "",
+            }}
+            onSubmit={handleSubmit}
+            validationSchema={() => {}}
+          >
+            {({ setFieldValue, values }) => (
+              <Form>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  
+                  <div className="relative">
+                    <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
+                      Saindo de
+                    </label>
+                    <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
+                      <MapPin className="text-vamu-green-dark w-5 h-5 mr-3 shrink-0" />
+                      <div className="w-full">
+                        <AsyncSelect
+                          name="cityBoarding"
+                          cacheOptions
+                          defaultOptions={false}
+                          loadOptions={fetchBrazilianCities}
+                          placeholder="Ex: Estação Butantã, São Paulo..."
+                          loadingMessage={() => "Buscando cidades..."}
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue.length < 2
+                              ? "Digite ao menos 2 caracteres"
+                              : "Nenhuma cidade encontrada"
+                          }
+                          styles={selectStyles}
+                          menuPortalTarget={
+                            typeof window !== "undefined" ? document.body : null
+                          }
+                          value={
+                            values.cityBoarding
+                              ? {
+                                  label: values.cityBoarding,
+                                  value: values.cityBoarding,
+                                }
+                              : null
+                          }
+                          onChange={(option: any) =>
+                            setFieldValue(
+                              "cityBoarding",
+                              option ? option.value : "",
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex gap-2 p-1 bg-vamu-gray rounded-xl">
-              <button className="px-4 py-2 text-sm font-semibold rounded-lg bg-white text-vamu-green-dark shadow-sm">
-                Apenas ida
-              </button>
-              <button className="px-4 py-2 text-sm font-semibold rounded-lg text-vamu-gray-dark hover:text-vamu-dark">
-                Ida e Volta
-              </button>
-            </div>
+                
+                  <div className="relative">
+                    <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
+                      Indo para
+                    </label>
+                    <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
+                      <GraduationCap className="text-vamu-green-dark w-5 h-5 mr-3 shrink-0" />
+                      <div className="w-full">
+                        <AsyncSelect
+                          name="cityDestination"
+                          cacheOptions
+                          defaultOptions={false}
+                          loadOptions={fetchBrazilianCities}
+                          placeholder="Ex: Portão 3 USP, Campus IFSP..."
+                          loadingMessage={() => "Buscando cidades..."}
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue.length < 2
+                              ? "Digite ao menos 2 caracteres"
+                              : "Nenhuma cidade encontrada"
+                          }
+                          styles={selectStyles}
+                          menuPortalTarget={
+                            typeof window !== "undefined" ? document.body : null
+                          }
+                          value={
+                            values.cityDestination
+                              ? {
+                                  label: values.cityDestination,
+                                  value: values.cityDestination,
+                                }
+                              : null
+                          }
+                          onChange={(option: any) =>
+                            setFieldValue(
+                              "cityDestination",
+                              option ? option.value : "",
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex items-center gap-4 flex-1 justify-end">
-              <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
-                <Calendar className="w-4 h-4 text-vamu-gray-dark" />
-                <span className="text-sm">Hoje, 24 de Outubro</span>
-              </div>
-              <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
-                <Users className="w-4 h-4 text-vamu-gray-dark" />
-                <span className="text-sm">1 passageiro</span>
-              </div>
-              <button className="bg-vamu-green-cta hover:bg-vamu-green-dark text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-vamu-green/20">
-                Buscar
-              </button>
-            </div>
-          </div>
+                {/* Ações inferiores */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex gap-2 p-1 bg-vamu-gray rounded-xl">
+                    <button
+                      type="button"
+                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-white text-vamu-green-dark shadow-sm"
+                    >
+                      Apenas ida
+                    </button>
+                    <button
+                      type="button"
+                      className="px-4 py-2 text-sm font-semibold rounded-lg text-vamu-gray-dark hover:text-vamu-dark"
+                    >
+                      Ida e Volta
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-4 flex-1 justify-end">
+                    <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
+                      <Calendar className="w-4 h-4 text-vamu-gray-dark" />
+                      <span className="text-sm">Hoje, 24 de Outubro</span>
+                    </div>
+                    <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
+                      <Users className="w-4 h-4 text-vamu-gray-dark" />
+                      <span className="text-sm">1 passageiro</span>
+                    </div>
+                    <button
+                      type="submit"
+                      className="bg-vamu-green-cta hover:bg-vamu-green-dark text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-vamu-green/20"
+                    >
+                      Buscar
+                    </button>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </section>
 
         <section className="mb-12">
@@ -162,7 +292,7 @@ const VamuDashboard = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {rideAsDriver.map((ride) => (
-              <RideCard key={ride?.id} ride={ride} onUpdate={fetchData}/>
+              <RideCard key={ride?.id} ride={ride} onUpdate={fetchData} />
             ))}
 
             <div className="border-2 border-dashed border-vamu-green/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center hover:bg-vamu-green-light/50 transition cursor-pointer group">

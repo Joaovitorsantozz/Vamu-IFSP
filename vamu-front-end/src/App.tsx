@@ -6,10 +6,11 @@ import Register from "./pages/register";
 import UserLogin from "./pages/login";
 import ProtectedRoute from "./features/protectedRoute";
 import Dashboard from "./pages/dashboard";
-import RidePage from "./pages/ridePage";
 import HasCarProtectedRoute from "./features/hasCarProtectedRoute";
 import DriverManageRide from "./pages/driverRideDetails";
 import UserProf from "./pages/userProfile";
+import RidePage from "./pages/offerRidePage";
+
 function App() {
   return (
     <Routes>

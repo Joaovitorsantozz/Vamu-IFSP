@@ -26,8 +26,9 @@ function Login() {
       setToken(token);
       alert(response.data.message);
       navigate("/dashboard");
-    } catch (err) {
-      console.error(err);
+    } catch (err:any) {
+  
+      alert(err.response?.data.message);
     }
   };
 

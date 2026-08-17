@@ -11,6 +11,7 @@ import {
 import { getFilteredUserInformationService } from "../services/userService.js";
 
 export async function registerRide(req: Request, res: Response) {
+  
   try {
     const user = (req as any).user;
 
@@ -26,11 +27,11 @@ export async function registerRide(req: Request, res: Response) {
     }
 
     const { modelo, placa, cor } = car;
-    const { boarding, destination, boardingTime } = req.body;
-
+    const { boarding, destination, boardingTime,cityDestination,cityBoarding} = req.body;
+    console.log("ola");
     const date = new Date(boardingTime);
 
-    if (!boarding || !destination || !boardingTime) {
+    if (!boarding || !destination || !boardingTime ||!cityBoarding||!cityDestination) {
       return res.status(400).json({ message: "Campos obrigatórios" });
     }
 
@@ -43,6 +44,7 @@ export async function registerRide(req: Request, res: Response) {
         .status(400)
         .json({ message: "Horário no passado não permitido" });
     }
+    console.log("Valores desestruturados:", { cityDestination, cityBoarding });
     const newRide = await offerRide(
       user.userId,
       nome,
@@ -52,8 +54,11 @@ export async function registerRide(req: Request, res: Response) {
       boarding,
       destination,
       boardingTime,
+      cityDestination,
+      cityBoarding
     );
-    res
+    console.log("oi filho da puta");
+    return res
       .status(201)
       .json({ message: "Carona registrada com sucesso", ride: newRide });
   } catch (error: any) {
@@ -107,10 +112,10 @@ export async function getRideByIdController(req: Request, res: Response) {
   try {
     const rideId = Number(req.params.rideId);
     if (!rideId) {
-      res.status(404).json({ message: "ID da corrida não fornecido" });
+      return res.status(404).json({ message: "ID da corrida não fornecido" });
     }
 
-    const result = getRideById(rideId);
+    const result = await getRideById(rideId);
     if (!result)
       return res.status(404).json({ message: "Corrida não encontrada" });
     return res.status(201).json({ message: "Corrida encontrada", result });

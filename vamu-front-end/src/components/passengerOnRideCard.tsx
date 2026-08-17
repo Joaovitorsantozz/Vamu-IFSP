@@ -1,6 +1,20 @@
+import { useState } from "react";
 import { changeRideStatus } from "../service/changeRideStatusService";
 
-export function PassengerCard({ passenger,rideId }: any) {
+export function PassengerCard({ passenger, rideId, onStatusChange }: any) {
+  const [loading, setLoading] = useState(false);
+  async function handleAccept(status: string) {
+    setLoading(true);
+    try {
+      await changeRideStatus(rideId, passenger.user_id, `${status}`);
+      onStatusChange(passenger.id,status);
+    } catch (error) {
+      console.error("Erro ao aceitar passageiro", error);
+      alert("Não foi possível aceitar a solicitação.");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <div
       key={passenger.id}
@@ -22,19 +36,21 @@ export function PassengerCard({ passenger,rideId }: any) {
 
       <div className="flex gap-3 mt-5">
         <button
-          className="flex-1 bg-green-500 hover:bg-green-600 transition text-white py-2 rounded-xl font-semibold"
+          className="cursor-pointer flex-1 bg-green-500 hover:bg-green-600 transition text-white py-2 rounded-xl font-semibold"
           onClick={() => {
-            changeRideStatus(rideId,passenger.user_id ,"accepted");
+            handleAccept("accepted");
           }}
+          disabled={loading}
         >
           Aceitar
         </button>
 
         <button
-          className="flex-1 bg-red-500 hover:bg-red-600 transition text-white py-2 rounded-xl font-semibold"
+          className="cursor-pointer flex-1 bg-red-500 hover:bg-red-600 transition text-white py-2 rounded-xl font-semibold"
           onClick={() => {
-            changeRideStatus(rideId,passenger.user_id, "rejected");
+            handleAccept("rejected");
           }}
+          disabled={loading}
         >
           Recusar
         </button>

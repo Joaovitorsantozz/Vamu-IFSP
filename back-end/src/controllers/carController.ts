@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { getCarInformationService, registerCarInformationService } from "../services/carService.js";
+import {
+  getCarInformationService,
+  registerCarInformationService,
+} from "../services/carService.js";
 export async function registerCarInformations(req: Request, res: Response) {
   try {
     const { carModel, placa, cor } = req.body;
@@ -33,17 +36,16 @@ export async function getCarInformation(req: Request, res: Response) {
   try {
     const userId = (req as any).user.userId;
     const result = await getCarInformationService(userId);
-    if (!result) {
-      return res.status(404).json({ message: "Informações do carro não encontradas" });
-    }
-    res.status(200).json({
-      message: "Informações do carro obtidas com sucesso",
-      result,
-    }); 
+    return res.status(200).json({
+      message: result
+        ? "Informações do carro obtidas com sucesso"
+        : "Usuário não possui carro cadastrado",
+      result: result || null,
+    });
   } catch (err) {
     console.log(err);
     return res
       .status(500)
       .json({ message: "Erro ao obter informações do carro", err });
-  } 
+  }
 }

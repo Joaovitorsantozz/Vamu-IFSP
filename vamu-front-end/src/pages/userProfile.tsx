@@ -14,7 +14,7 @@ function UserProf() {
     async function getUser() {
       try {
         const token = localStorage.getItem("token");
-
+        console.log("oioiio",token);
         const [resUser, resCar] = await Promise.all([
           Axios.get("http://localhost:3000/user-information", {
             headers: { Authorization: `Bearer ${token}` },
@@ -427,7 +427,7 @@ function UserProf() {
 
             <div className="flex flex-col md:flex-row gap-4 justify-end mt-4">
               <a
-                href="/userProfile"
+                href="/dashboard"
                 className="font-medium text-center flex items-center justify-center border-[1px] border-vamu-gray-medium rounded-md py-3 px-6 hover:bg-red-500 hover:text-white transition-colors"
               >
                 Cancelar

@@ -4,15 +4,19 @@ export const offerRideSubmit = (data: {
   boarding: string;
   destination: string;
   boardingTime: string;
+  cityDestination:string;
+  cityBoarding:string;
 }) => {
   const token = localStorage.getItem("token");
-
+  console.log("ola axios",data);
   return Axios.post(
     "http://localhost:3000/offer-ride",
     {
       boarding: data.boarding,
       destination: data.destination,
       boardingTime: data.boardingTime,
+      cityBoarding:data.cityBoarding,
+      cityDestination:data.cityDestination
     },
     {
       headers: {

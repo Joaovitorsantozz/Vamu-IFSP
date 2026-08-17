@@ -8,6 +8,8 @@ export async function offerRide(
   boarding: String,
   destination: String,
   boardingTime: Date,
+  cityDestination: String, // 9º parâmetro
+  cityBoarding: String     // 10º parâmetro
 ) {
   const query = `
     INSERT INTO offered_rides (
@@ -19,9 +21,11 @@ export async function offerRide(
       boarding, 
       destination, 
       boarding_time,
-      available_seats
+      available_seats,
+      city_destination,
+      city_boarding
     ) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *; 
   `;
 
@@ -34,7 +38,9 @@ export async function offerRide(
     boarding,
     destination,
     boardingTime,
-    "4",
+    4,
+    cityDestination,
+    cityBoarding   
   ];
 
   try {
@@ -42,12 +48,23 @@ export async function offerRide(
     return res.rows[0];
   } catch (err) {
     console.error("Erro ao inserir carona:", err);
-    throw new Error("Erro ao registrar a carona no banco de dados.");
+    throw err;
   }
 }
 
 export async function getRideById(rideId: Number) {
-  const query = `SELECT * FROM offered_rides WHERE id=$1`;
+  const query = `
+    SELECT 
+      r.*,
+      COALESCE(
+        COUNT(p.id) FILTER (WHERE LOWER(p.status) = 'accepted'), 
+        0
+      )::INT AS passengers_count
+    FROM offered_rides r
+    LEFT JOIN ride_passengers p ON p.ride_id = r.id
+    WHERE r.id = $1
+    GROUP BY r.id;
+  `;
   try {
     const result = await pool.query(query, [rideId]);
     return result.rows[0];
@@ -90,9 +107,9 @@ export async function updateRaceStatusService(
   ride_id: number,
   user_id: number,
 ) {
-  console.log("status service",status);
-  console.log("ride",ride_id);
-  console.log("userid",user_id);
+  console.log("status service", status);
+  console.log("ride", ride_id);
+  console.log("userid", user_id);
   const query = `UPDATE ride_passengers SET status = $1 WHERE user_id = $2 AND ride_id = $3;`;
   const result = await pool.query(query, [status, user_id, ride_id]);
   console.log(result.rowCount);
