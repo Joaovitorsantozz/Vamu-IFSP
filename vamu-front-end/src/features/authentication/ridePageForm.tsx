@@ -76,8 +76,63 @@ const RideForm = () => {
       {({ setFieldValue, values }) => (
         <Form className="space-y-8">
      
-          <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 border border-vamu-border">
-   
+               <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 border border-vamu-border">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-vamu-green-light p-2.5 rounded-xl text-vamu-green-dark">
+                <Car className="w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-bold text-vamu-dark">
+                Dados do Veículo
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
+                  Nome do Proprietário
+                </label>
+                <Field name="ownerName" className={inputStyle} disabled />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
+                  Placa do Carro
+                </label>
+                <Field name="carPlate" className={inputStyle} disabled />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
+                  Modelo do Carro
+                </label>
+                <Field name="carModel" disabled className={inputStyle} />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-vamu-gray-dark ml-1">
+                  Cor
+                </label>
+                <div className="relative">
+                  <Field
+                    as="select"
+                    name="carColor"
+                    disabled
+                    className={`${inputStyle} appearance-none`}
+                  >
+                    <option value="" disabled>
+                      Selecione a cor
+                    </option>
+                    <option value="Branco">Branco</option>
+                    <option value="Preto">Preto</option>
+                    <option value="Cinza/Prata">Cinza/Prata</option>
+                    <option value="Vermelho">Vermelho</option>
+                    <option value="Azul">Azul</option>
+                    <option value="Outra">Outra</option>
+                  </Field>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-vamu-gray-dark pointer-events-none" />
+                </div>
+              </div>
+            </div>
           </section>
 
      

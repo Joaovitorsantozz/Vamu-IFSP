@@ -10,6 +10,8 @@ import HasCarProtectedRoute from "./features/hasCarProtectedRoute";
 import DriverManageRide from "./pages/driverRideDetails";
 import UserProf from "./pages/userProfile";
 import RidePage from "./pages/offerRidePage";
+import SearchRidePage from "./pages/searchRide";
+import { RideProvider } from "./context/rideSearchContext";
 
 function App() {
   return (
@@ -21,9 +23,11 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
+          <RideProvider>
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </RideProvider>
         }
       ></Route>
       <Route
@@ -52,7 +56,16 @@ function App() {
           </ProtectedRoute>
         }
       ></Route>
-      
+      <Route
+        path="/result-rides"
+        element={
+          <RideProvider>
+            <ProtectedRoute>
+              <SearchRidePage></SearchRidePage>
+            </ProtectedRoute>
+          </RideProvider>
+        }
+      ></Route>
     </Routes>
   );
 }

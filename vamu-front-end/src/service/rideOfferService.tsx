@@ -33,8 +33,8 @@ export const getDriverInfo = (token: string) => {
   });
 };
 
-export const getRacesAsDriver = (token: string) => {
-  return Axios.get(`${API_URL}/my-races-as-driver`, {
+export const getActiveRaces = (token: string) => {
+  return Axios.get(`${API_URL}/my-actives-races`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

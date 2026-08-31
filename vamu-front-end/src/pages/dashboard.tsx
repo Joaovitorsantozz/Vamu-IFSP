@@ -1,23 +1,18 @@
 import {
-  MapPin,
-  GraduationCap,
-  Calendar,
-  Users,
+
   Car,
   Clock,
   ArrowRight,
 } from "lucide-react";
 import Logo from "../assets/icons/logo1.png";
-import User from "../assets/icons/user.png";
-import BellNotification from "../assets/icons/bellnotifications.png";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
-import { getRacesAsDriver } from "../service/rideOfferService";
+import { getActiveRaces} from "../service/rideOfferService";
 import { RideCard } from "../components/ridecard";
-import { Formik, Form } from "formik";
-import { fetchBrazilianCities } from "../service/ibgeAPIcities";
-import AsyncSelect from "react-select/async";
+
+import UserNavbar from "../components/userNavbar";
+import SearchRideContainer from "../components/searchRidesContainer";
 type Ride = {
   id: number;
   boarding: string;
@@ -26,60 +21,19 @@ type Ride = {
   boarding_time: string;
   is_active: boolean;
   passengers_count: number;
+  role:string;
 };
 const VamuDashboard = () => {
   const { car } = useContext(UserContext);
   const token = localStorage.getItem("token");
-  const [rideAsDriver, setRideAsDriver] = useState<Ride[]>([]);
-  const handleSubmit = () => {};
-  const selectStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: "transparent",
-      border: "none",
-      boxShadow: "none",
-      minHeight: "auto",
-      cursor: "text",
-      width: "100%",
-      padding: 0,
-      "&:hover": {
-        border: "none",
-      },
-    }),
-    valueContainer: (provided: any) => ({
-      ...provided,
-      padding: "0px",
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      margin: 0,
-      padding: 0,
-      color: "#1E293B",
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      margin: 0,
-      color: "#94A3B8",
-      fontSize: "0.875rem",
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      margin: 0,
-      color: "#1E293B",
-    }),
-    indicatorsContainer: () => ({
-      display: "none",
-    }),
-    menuPortal: (base: any) => ({
-      ...base,
-      zIndex: 9999,
-    }),
-  };
-  async function fetchData() {
+  const [activeRaces, setActiveRaces] = useState<Ride[]>([]);
+
+async function fetchData() {
     try {
       if (!token) return;
-      const response = await getRacesAsDriver(token);
-      setRideAsDriver(
+      const response = await getActiveRaces(token);
+
+      setActiveRaces(
         Array.isArray(response.data.result)
           ? response.data.result
           : [response.data.result],
@@ -91,46 +45,9 @@ const VamuDashboard = () => {
   useEffect(() => {
     fetchData();
   }, [token]);
-
   return (
     <div className="min-h-screen bg-vamu-gray font-jakarta text-vamu-dark">
-      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-vamu-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-            <img src={Logo} alt="VAMU Logo" className="w-8 h-8" />
-          </div>
-          <Link to="/dashboard">
-            <h1 className="text-xl md:text-[20px] font-bold text-vamu-dark">
-              Vamu
-            </h1>
-          </Link>
-        </div>
-        <div className="flex items-center gap-8 text-sm font-medium text-vamu-gray-dark">
-          <a href="#" className="hover:text-vamu-green-dark transition">
-            Minhas Caronas
-          </a>
-          <a href="#" className="hover:text-vamu-green-dark transition">
-            Oferecer Carona
-          </a>
-          <div className="flex items-center gap-3 pl-4 border-l border-vamu-border">
-            <div className="relative">
-              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-              <div className="w-8 h-8 bg-vamu-gray rounded-full flex items-center justify-center">
-                <img
-                  src={BellNotification}
-                  alt="Notificação"
-                  className="w-5 h-5"
-                />
-              </div>
-            </div>
-            <div className="w-8 h-8 border-2 border-vamu-green rounded-full flex items-center justify-center">
-              <Link to="/my-profile">
-                <img src={User} alt="Perfil do usuário" className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <UserNavbar></UserNavbar>
 
       <main className="max-w-5xl mx-auto pt-12 pb-20 px-6">
         <section className="text-center mb-10">
@@ -143,144 +60,8 @@ const VamuDashboard = () => {
           </p>
         </section>
 
-        <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 mb-16 border border-vamu-border">
-          <Formik
-            initialValues={{
-              cityBoarding: "",
-              cityDestination: "",
-            }}
-            onSubmit={handleSubmit}
-            validationSchema={() => {}}
-          >
-            {({ setFieldValue, values }) => (
-              <Form>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  
-                  <div className="relative">
-                    <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
-                      Saindo de
-                    </label>
-                    <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
-                      <MapPin className="text-vamu-green-dark w-5 h-5 mr-3 shrink-0" />
-                      <div className="w-full">
-                        <AsyncSelect
-                          name="cityBoarding"
-                          cacheOptions
-                          defaultOptions={false}
-                          loadOptions={fetchBrazilianCities}
-                          placeholder="Ex: Estação Butantã, São Paulo..."
-                          loadingMessage={() => "Buscando cidades..."}
-                          noOptionsMessage={({ inputValue }) =>
-                            inputValue.length < 2
-                              ? "Digite ao menos 2 caracteres"
-                              : "Nenhuma cidade encontrada"
-                          }
-                          styles={selectStyles}
-                          menuPortalTarget={
-                            typeof window !== "undefined" ? document.body : null
-                          }
-                          value={
-                            values.cityBoarding
-                              ? {
-                                  label: values.cityBoarding,
-                                  value: values.cityBoarding,
-                                }
-                              : null
-                          }
-                          onChange={(option: any) =>
-                            setFieldValue(
-                              "cityBoarding",
-                              option ? option.value : "",
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                
-                  <div className="relative">
-                    <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
-                      Indo para
-                    </label>
-                    <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
-                      <GraduationCap className="text-vamu-green-dark w-5 h-5 mr-3 shrink-0" />
-                      <div className="w-full">
-                        <AsyncSelect
-                          name="cityDestination"
-                          cacheOptions
-                          defaultOptions={false}
-                          loadOptions={fetchBrazilianCities}
-                          placeholder="Ex: Portão 3 USP, Campus IFSP..."
-                          loadingMessage={() => "Buscando cidades..."}
-                          noOptionsMessage={({ inputValue }) =>
-                            inputValue.length < 2
-                              ? "Digite ao menos 2 caracteres"
-                              : "Nenhuma cidade encontrada"
-                          }
-                          styles={selectStyles}
-                          menuPortalTarget={
-                            typeof window !== "undefined" ? document.body : null
-                          }
-                          value={
-                            values.cityDestination
-                              ? {
-                                  label: values.cityDestination,
-                                  value: values.cityDestination,
-                                }
-                              : null
-                          }
-                          onChange={(option: any) =>
-                            setFieldValue(
-                              "cityDestination",
-                              option ? option.value : "",
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Ações inferiores */}
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex gap-2 p-1 bg-vamu-gray rounded-xl">
-                    <button
-                      type="button"
-                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-white text-vamu-green-dark shadow-sm"
-                    >
-                      Apenas ida
-                    </button>
-                    <button
-                      type="button"
-                      className="px-4 py-2 text-sm font-semibold rounded-lg text-vamu-gray-dark hover:text-vamu-dark"
-                    >
-                      Ida e Volta
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-4 flex-1 justify-end">
-                    <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
-                      <Calendar className="w-4 h-4 text-vamu-gray-dark" />
-                      <span className="text-sm">Hoje, 24 de Outubro</span>
-                    </div>
-                    <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
-                      <Users className="w-4 h-4 text-vamu-gray-dark" />
-                      <span className="text-sm">1 passageiro</span>
-                    </div>
-                    <button
-                      type="submit"
-                      className="bg-vamu-green-cta hover:bg-vamu-green-dark text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-vamu-green/20"
-                    >
-                      Buscar
-                    </button>
-                  </div>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </section>
-
+     
+        <SearchRideContainer></SearchRideContainer>
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="flex items-center gap-2 font-bold text-vamu-dark text-lg">
@@ -291,7 +72,7 @@ const VamuDashboard = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {rideAsDriver.map((ride) => (
+            {activeRaces.map((ride) => (
               <RideCard key={ride?.id} ride={ride} onUpdate={fetchData} />
             ))}
 

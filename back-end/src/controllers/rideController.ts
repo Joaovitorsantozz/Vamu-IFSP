@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import { getCarInformationService } from "../services/carService.js";
 import {
   deleteRaceService,
-  getDriverRaceInformationsService,
+  getActiveRacesService,
   getRideById,
   offerRide,
+  resultRidesServices,
   updateRaceStatusService,
 } from "../services/rideService.js";
 import { getFilteredUserInformationService } from "../services/userService.js";
 
 export async function registerRide(req: Request, res: Response) {
-  
   try {
     const user = (req as any).user;
 
@@ -27,11 +27,23 @@ export async function registerRide(req: Request, res: Response) {
     }
 
     const { modelo, placa, cor } = car;
-    const { boarding, destination, boardingTime,cityDestination,cityBoarding} = req.body;
-    console.log("ola");
+    const {
+      boarding,
+      destination,
+      boardingTime,
+      cityDestination,
+      cityBoarding,
+    } = req.body;
+
     const date = new Date(boardingTime);
 
-    if (!boarding || !destination || !boardingTime ||!cityBoarding||!cityDestination) {
+    if (
+      !boarding ||
+      !destination ||
+      !boardingTime ||
+      !cityBoarding ||
+      !cityDestination
+    ) {
       return res.status(400).json({ message: "Campos obrigatórios" });
     }
 
@@ -44,7 +56,7 @@ export async function registerRide(req: Request, res: Response) {
         .status(400)
         .json({ message: "Horário no passado não permitido" });
     }
-    console.log("Valores desestruturados:", { cityDestination, cityBoarding });
+
     const newRide = await offerRide(
       user.userId,
       nome,
@@ -55,9 +67,9 @@ export async function registerRide(req: Request, res: Response) {
       destination,
       boardingTime,
       cityDestination,
-      cityBoarding
+      cityBoarding,
     );
-    console.log("oi filho da puta");
+
     return res
       .status(201)
       .json({ message: "Carona registrada com sucesso", ride: newRide });
@@ -98,15 +110,18 @@ export async function getDriverInformations(req: Request, res: Response) {
   }
 }
 
-export async function getDriverRaceInformations(req: Request, res: Response) {
-  const userId = (req as any).user.userId;
-  const result = await getDriverRaceInformationsService(userId);
-  if (!result) {
-    return res.status(200).json([]);
+export async function getActiveRaces(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.userId;
+    const result = await getActiveRacesService(userId);
+
+    return res
+      .status(201)
+      .json({ message: "Suas caronas como motorista active==true", result });
+  } catch (error) {
+    console.log("error buscar caronas ativas");
+    return res.status(500).json({ message: "Erro ao buscar caronas ativas" });
   }
-  return res
-    .status(201)
-    .json({ message: "Suas caronas como motorista active==true", result });
 }
 export async function getRideByIdController(req: Request, res: Response) {
   try {
@@ -162,7 +177,6 @@ export async function updateStatus(req: Request, res: Response) {
     }
 
     if (status != "accepted" && status != "rejected") {
-  
       return res.status(400).json({ message: "Status não tolerado" });
     }
     await updateRaceStatusService(status, Number(rideId), Number(userId));
@@ -175,4 +189,21 @@ export async function updateStatus(req: Request, res: Response) {
       .status(500)
       .json({ message: "Erro ao alterar status da corrida" });
   }
+}
+
+export async function resultRides(req: Request, res: Response) {
+  const { boarding, destination } = req.query;
+  const userId = (req as any).user.userId;
+  console.log("boarding %s \n", boarding);
+  console.log("destination", destination);
+  const rides = await resultRidesServices({
+    destination: destination ? String(destination) : undefined,
+    boarding: boarding ? String(boarding) : undefined,
+  },userId);
+  if (!rides) {
+    return res
+      .status(400)
+      .json({ message: "Erro ao buscar caronas, não encontradas" });
+  }
+  return res.status(200).json({ rides });
 }

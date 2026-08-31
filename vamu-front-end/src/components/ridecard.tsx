@@ -12,6 +12,7 @@ type Ride = {
   boarding_time: string;
   is_active: boolean;
   passengers_count: number;
+  role: string;
 };
 
 export function RideCard({ ride, onUpdate }: RideCardProps) {
@@ -35,7 +36,7 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
     <div className="bg-white p-6 rounded-2xl border border-vamu-border shadow-sm relative overflow-hidden">
       <div className="flex justify-between items-start mb-4">
         <span className="text-[10px] font-bold text-vamu-gray-dark uppercase tracking-wider">
-          VOCÊ É MOTORISTA
+          VOCÊ É {ride.role}
         </span>
 
         <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
@@ -79,21 +80,27 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
           )}
         </div>
 
-        <Link
-          to={`/manage-ride/${ride.id}`}
-          state={{ride}}
-          className="text-[11px] font-bold bg-vamu-gray text-vamu-gray-dark px-3 py-1.5 rounded-lg border border-vamu-border"
-        >
-          Gerenciar
-        </Link>
-        <button
-          onClick={() => {
-            handleDelete(ride.id);
-          }}
-          className="text-[11px] font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-200 transition"
-        >
-          Excluir
-        </button>
+        {ride.role === "MOTORISTA" ? (
+          <>
+            <Link
+              to={`/manage-ride/${ride.id}`}
+              state={{ ride }}
+              className="text-[11px] font-bold bg-vamu-gray text-vamu-gray-dark px-3 py-1.5 rounded-lg border border-vamu-border"
+            >
+              Gerenciar
+            </Link>
+            <button
+              onClick={() => {
+                handleDelete(ride.id);
+              }}
+              className="text-[11px] font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-200 transition"
+            >
+              Excluir
+            </button>
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
