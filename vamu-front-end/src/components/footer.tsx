@@ -38,7 +38,7 @@ function Footer() {
       </div>
 
       <p className="text-center text-[13px] text-vamu-gray-medium">
-        © 2026 Vamu Mobilidade Universitária. Todos os direitos reservados.
+        © 2025 Vamu Mobilidade Universitária. Todos os direitos reservados.
       </p>
     </footer>
   );

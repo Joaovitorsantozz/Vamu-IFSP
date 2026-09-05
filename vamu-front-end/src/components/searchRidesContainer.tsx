@@ -1,10 +1,16 @@
 import { Formik, Form } from "formik";
 import { fetchBrazilianCities } from "../service/ibgeAPIcities";
 import AsyncSelect from "react-select/async";
-import { MapPin, GraduationCap, Calendar, Users } from "lucide-react";
+import {
+  MapPin,
+  GraduationCap,
+  Calendar,
+  Users,
+  VenetianMask,
+} from "lucide-react";
 import { searchRideService } from "../service/searchRideService";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useRideSearch } from "../context/rideSearchContext";
 
 interface FormValues {
@@ -12,6 +18,7 @@ interface FormValues {
   cityDestination: string;
 }
 export default function SearchRideContainer() {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const {
@@ -23,33 +30,45 @@ export default function SearchRideContainer() {
     setCityDestination,
     setRides,
   } = useRideSearch();
-
-  const handleSubmit = async (values: FormValues) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Sessão expirada. Faça login novamente.");
-        return;
+  const boarding = searchParams.get("boarding") || "";
+  const destination = searchParams.get("destination") || "";
+  const executeSearch = useCallback(
+    async (b: string, d: string) => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const response = await searchRideService(
+          token,
+          b,
+          tripType === "ida" ? "" : d,
+        );  
+        setRides(response.data.rides);
+      } catch (error) {
+        console.log("erro ao buscar corridas", error);
       }
+    },
+    [tripType, setRides],
+  );
 
-      if (setCityBoarding) setCityBoarding(values.cityBoarding);
-      if (setCityDestination) setCityDestination(values.cityDestination);
-
-      const response = await searchRideService(
-        token,
-        values.cityBoarding,
-        tripType === "ida" ? "" : values.cityDestination,
-      );
-      console.log(response);
-      setRides(response.data.rides);
-
-      if (location.pathname !== "/result-rides") {
-        navigate("/result-rides");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar caronas", error);
+  useEffect(()=>{
+    if(boarding || destination){
+      if(setCityBoarding) setCityBoarding(boarding);
+      if(setCityDestination) setCityDestination(destination);
+      executeSearch(boarding,destination);
     }
-  };
+  },[boarding,destination,setCityBoarding,setCityBoarding,executeSearch])
+
+  const handleSubmit= (values:FormValues)=>{
+    const params = new URLSearchParams();
+    if(values.cityBoarding) params.append("boarding",values.cityBoarding);
+    if(values.cityDestination)params.append("destination",values.cityDestination);
+
+    if (setCityBoarding) setCityBoarding(values.cityBoarding);
+    if (setCityDestination) setCityDestination(values.cityDestination);
+
+
+    navigate(`/result-rides?${params.toString()}`);
+  }
   const selectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
@@ -100,8 +119,8 @@ export default function SearchRideContainer() {
     <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 mb-16 border border-vamu-border">
       <Formik<FormValues>
         initialValues={{
-          cityBoarding: city_boarding || "",
-          cityDestination: city_destination || "",
+          cityBoarding: boarding,
+          cityDestination: destination,
         }}
         enableReinitialize
         onSubmit={handleSubmit}
@@ -109,7 +128,6 @@ export default function SearchRideContainer() {
         {({ setFieldValue, values }) => (
           <Form>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-             
               <div className="relative">
                 <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
                   Saindo de
@@ -135,11 +153,17 @@ export default function SearchRideContainer() {
                       }
                       value={
                         values.cityBoarding
-                          ? { label: values.cityBoarding, value: values.cityBoarding }
+                          ? {
+                              label: values.cityBoarding,
+                              value: values.cityBoarding,
+                            }
                           : null
                       }
                       onChange={(option: any) =>
-                        setFieldValue("cityBoarding", option ? option.value : "")
+                        setFieldValue(
+                          "cityBoarding",
+                          option ? option.value : "",
+                        )
                       }
                     />
                   </div>
@@ -160,7 +184,9 @@ export default function SearchRideContainer() {
                 >
                   <GraduationCap
                     className={`w-5 h-5 mr-3 shrink-0 transition-colors ${
-                      tripType === "ida" ? "text-slate-400" : "text-vamu-green-dark"
+                      tripType === "ida"
+                        ? "text-slate-400"
+                        : "text-vamu-green-dark"
                     }`}
                   />
                   <div className="w-full">
@@ -187,11 +213,17 @@ export default function SearchRideContainer() {
                       }
                       value={
                         values.cityDestination && tripType !== "ida"
-                          ? { label: values.cityDestination, value: values.cityDestination }
+                          ? {
+                              label: values.cityDestination,
+                              value: values.cityDestination,
+                            }
                           : null
                       }
                       onChange={(option: any) =>
-                        setFieldValue("cityDestination", option ? option.value : "")
+                        setFieldValue(
+                          "cityDestination",
+                          option ? option.value : "",
+                        )
                       }
                     />
                   </div>

@@ -180,7 +180,7 @@ async function fetchData() {
           </a>
         </div>
         <p className="text-xs text-vamu-gray-dark">
-          © 2024 Vamu Tecnologias Ltda.
+          © 2025 Vamu Tecnologias Ltda.
         </p>
       </footer>
     </div>

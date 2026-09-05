@@ -1,6 +1,7 @@
 import { Star, Clock } from "lucide-react";
 import userPic from "../assets/icons/user.png";
 import Axios from "axios";
+import { date } from "yup";
 export interface Ride {
  
   id: number;
@@ -20,6 +21,14 @@ export interface RideCardProps {
   ride: Ride;
   onRideAccepted?: (rideId: number) => void;
 }
+function formatDate(date: string) {
+  const d = new Date(date);
+
+  return d.toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
 export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
   const driverName = ride?.owner_name ?? "Motorista";
 
@@ -37,13 +46,14 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
 
   const availableSeats = ride?.available_seats ?? 0;
   const isFull = availableSeats <= 0;
-
-  const departureTime = ride?.boarding_time
-    ? new Date(ride.boarding_time).toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "--:--";
+  const boarding_time= ride.boarding_time ? ride.boarding_time : "";
+  const dataObj = new Date(boarding_time);
+  const dia=dataObj.toLocaleDateString("pt-BR");
+  const hora=dataObj.toLocaleTimeString("pt-BR",{
+    hour:"2-digit",
+    minute:"2-digit"
+  })
+  const [dayTime,hourTime]=boarding_time.split(/[ T]/);
   const originCity = ride?.city_boarding ?? ride?.boarding ?? "Origem";
   const destinationCity =
     ride?.city_destination ?? ride?.destination ?? "Destino";
@@ -100,10 +110,14 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
 
       {/* Rota e Horário */}
       <div className="flex items-center gap-4 flex-1 justify-center w-full md:w-auto">
-        <div className="text-center min-w-[90px]">
+        <div className="text-center min-w-[90px] flex flex-col gap-1" >
           <time className="text-xl font-bold text-vamu-dark block">
-            {departureTime}
+            {hora}
           </time>
+          <span
+            className="block text-xs text-vamu-gray-dark truncate max-w-[120px]"
+
+          >{dia}</span>
           <span
             className="block text-xs text-vamu-gray-dark truncate max-w-[120px]"
             title={originCity}
@@ -164,3 +178,4 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
     </article>
   );
 }
+
