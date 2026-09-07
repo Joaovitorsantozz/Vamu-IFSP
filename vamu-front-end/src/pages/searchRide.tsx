@@ -14,10 +14,34 @@ import {
 import RideFoundCard, { type Ride } from "../components/rideFoundCard";
 
 import { useRideSearch } from "../context/rideSearchContext";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SearchRidePage() {
   const { rides, setRides } = useRideSearch();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
+  const selectedTimes = searchParams.get("time")?.split(",") || [];
+
+  const handleTimeFilterChange = (timeKey: string) => {
+    let updatedTimes: string[];
+
+    if (selectedTimes.includes(timeKey)) {
+      updatedTimes = selectedTimes.filter((t) => t !== timeKey);
+    } else {
+      updatedTimes = [...selectedTimes, timeKey];
+    }
+
+    const params = new URLSearchParams(searchParams);
+
+    if (updatedTimes.length > 0) {
+      params.set("time", updatedTimes.join(","));
+    } else {
+      params.delete("time");
+    }
+
+    navigate(`?${params.toString()}`, { replace: true });
+  };
   return (
     <div className="min-h-screen bg-vamu-gray font-jakarta text-vamu-dark">
       <UserNavbar></UserNavbar>
@@ -35,15 +59,18 @@ export default function SearchRidePage() {
               <label className="flex items-center gap-3 text-sm text-vamu-dark cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={selectedTimes.includes("morning")}
+                  onChange={() => handleTimeFilterChange("morning")}
                   className="w-4 h-4 rounded border-vamu-border text-vamu-green focus:ring-vamu-green"
                 />
                 <span>Manhã (06:00 - 12:00)</span>
               </label>
 
-              <label className="flex items-center gap-3 text-sm font-semibold text-vamu-dark bg-vamu-gray p-2.5 rounded-xl cursor-pointer">
+              <label className="flex items-center gap-3 text-sm text-vamu-dark cursor-pointer">
                 <input
                   type="checkbox"
-                  defaultChecked
+                  checked={selectedTimes.includes("afternoon")}
+                  onChange={() => handleTimeFilterChange("afternoon")}
                   className="w-4 h-4 rounded border-vamu-border text-vamu-green focus:ring-vamu-green"
                 />
                 <span>Tarde (12:00 - 18:00)</span>
@@ -52,12 +79,13 @@ export default function SearchRidePage() {
               <label className="flex items-center gap-3 text-sm text-vamu-dark cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={selectedTimes.includes("night")}
+                  onChange={() => handleTimeFilterChange("night")}
                   className="w-4 h-4 rounded border-vamu-border text-vamu-green focus:ring-vamu-green"
                 />
                 <span>Noite (18:00 - 23:59)</span>
               </label>
             </div>
-
             <hr className="border-vamu-border" />
 
             <div className="space-y-3">
@@ -114,7 +142,6 @@ export default function SearchRidePage() {
                 key={ridesi.id}
                 ride={ridesi}
                 onRideAccepted={(acceptedId) => {
-               
                   setRides(rides.filter((r) => r.id !== acceptedId));
                 }}
               />

@@ -192,14 +192,19 @@ export async function updateStatus(req: Request, res: Response) {
 }
 
 export async function resultRides(req: Request, res: Response) {
-  const { boarding, destination } = req.query;
+  const { boarding, destination, date, timeFilter } = req.query;
+
   const userId = (req as any).user.userId;
-  console.log("boarding %s \n", boarding);
-  console.log("destination", destination);
-  const rides = await resultRidesServices({
-    destination: destination ? String(destination) : undefined,
-    boarding: boarding ? String(boarding) : undefined,
-  },userId);
+
+  const rides = await resultRidesServices(
+    {
+      destination: destination ? String(destination) : undefined,
+      boarding: boarding ? String(boarding) : undefined,
+      date: date ? String(date) : undefined,
+      timeFilter:timeFilter ? String ( timeFilter) : undefined
+    },
+    userId,
+  );
   if (!rides) {
     return res
       .status(400)
