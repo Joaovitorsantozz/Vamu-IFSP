@@ -2,9 +2,9 @@ import {
 
   Car,
   Clock,
-  ArrowRight,
 } from "lucide-react";
-import Logo from "../assets/icons/logo1.png";
+
+import logoimg from "../assets/icons/logo1.png";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
@@ -13,6 +13,9 @@ import { RideCard } from "../components/ridecard";
 
 import UserNavbar from "../components/userNavbar";
 import SearchRideContainer from "../components/searchRidesContainer";
+import DashFooter from "../components/dashFooter" ;
+import RideRecord from "../components/manage-ride/rideRecord";
+
 type Ride = {
   id: number;
   boarding: string;
@@ -61,7 +64,8 @@ async function fetchData() {
         </section>
 
      
-        <SearchRideContainer></SearchRideContainer>
+        <SearchRideContainer checkUp = {undefined}></SearchRideContainer>
+        
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="flex items-center gap-2 font-bold text-vamu-dark text-lg">
@@ -102,87 +106,12 @@ async function fetchData() {
               Caronas Recentes
             </h2>
           </div>
-          <div className="bg-white rounded-2xl border border-vamu-border overflow-hidden shadow-sm">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-vamu-gray text-[11px] font-bold text-vamu-gray-dark uppercase tracking-widest border-b border-vamu-border">
-                  <th className="px-6 py-4">Rota</th>
-                  <th className="px-6 py-4">Data</th>
-                  <th className="px-6 py-4">Com quem</th>
-                  <th className="px-6 py-4 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                <tr className="border-b border-vamu-border hover:bg-vamu-gray/30 transition">
-                  <td className="px-6 py-4 font-semibold text-vamu-dark">
-                    Terminal Barra Funda{" "}
-                    <ArrowRight className="inline w-3 h-3 mx-1 text-vamu-green" />{" "}
-                    UNESP
-                  </td>
-                  <td className="px-6 py-4 text-vamu-gray-dark">
-                    22 Out, 2024
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-vamu-gray-light rounded-full"></div>
-                      <span className="text-vamu-gray-dark">Ana Julia L.</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="bg-vamu-gray-light text-vamu-gray-dark text-[10px] font-bold px-2 py-1 rounded">
-                      FINALIZADA
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-vamu-gray/30 transition">
-                  <td className="px-6 py-4 font-semibold text-vamu-dark">
-                    Home Office{" "}
-                    <ArrowRight className="inline w-3 h-3 mx-1 text-vamu-green" />{" "}
-                    Mackenzie
-                  </td>
-                  <td className="px-6 py-4 text-vamu-gray-dark">
-                    20 Out, 2024
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-vamu-gray-light rounded-full"></div>
-                      <span className="text-vamu-gray-dark">Felipe M.</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="bg-vamu-gray-light text-vamu-gray-dark text-[10px] font-bold px-2 py-1 rounded">
-                      FINALIZADA
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <RideRecord></RideRecord>
         </section>
       </main>
 
-      <footer className="max-w-5xl mx-auto px-6 py-10 border-t border-vamu-border flex flex-wrap justify-between items-center gap-6">
-        <div className="flex items-center gap-2 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition">
-          <img src={Logo} alt="VAMU Logo" className="w-6 h-6" />
-          <h1 className="text-xl md:text-[20px] font-bold text-vamu-dark">
-            Vamu
-          </h1>
-        </div>
-        <div className="flex gap-6 text-sm text-vamu-gray-dark font-medium">
-          <a href="#" className="hover:text-vamu-green-dark">
-            Termos
-          </a>
-          <a href="#" className="hover:text-vamu-green-dark">
-            Privacidade
-          </a>
-          <a href="#" className="hover:text-vamu-green-dark">
-            Suporte
-          </a>
-        </div>
-        <p className="text-xs text-vamu-gray-dark">
-          © 2025 Vamu Tecnologias Ltda.
-        </p>
-      </footer>
+      <DashFooter></DashFooter>          
+     
     </div>
   );
 };

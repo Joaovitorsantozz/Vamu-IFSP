@@ -17,7 +17,7 @@ interface FormValues {
   cityBoarding: string;
   cityDestination: string;
 }
-export default function SearchRideContainer() {
+export default function SearchRideContainer( {checkUp} ) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -115,6 +115,8 @@ export default function SearchRideContainer() {
     }),
   };
 
+  
+
   return (
     <section className="bg-white rounded-3xl shadow-xl shadow-vamu-dark-deep/5 p-8 mb-16 border border-vamu-border">
       <Formik<FormValues>
@@ -133,7 +135,7 @@ export default function SearchRideContainer() {
                   Saindo de
                 </label>
                 <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
-                  <MapPin className="text-vamu-green-dark w-5 h-5 mr-3 shrink-0" />
+                  <MapPin className={`${checkUp? "text-vamu-dark-pink":"text-vamu-green-dark"} w-5 h-5 mr-3 shrink-0`} />
                   <div className="w-full">
                     <AsyncSelect
                       name="cityBoarding"
@@ -186,7 +188,7 @@ export default function SearchRideContainer() {
                     className={`w-5 h-5 mr-3 shrink-0 transition-colors ${
                       tripType === "ida"
                         ? "text-slate-400"
-                        : "text-vamu-green-dark"
+                        : checkUp? "text-vamu-dark-pink" : "text-vamu-green-dark"
                     }`}
                   />
                   <div className="w-full">
@@ -238,7 +240,7 @@ export default function SearchRideContainer() {
                   type="button"
                   className={`px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
                     tripType === "ida"
-                      ? "bg-vamu-green text-white shadow-md shadow-vamu-green/20 scale-[1.02]"
+                      ? (checkUp?"bg-vamu-pink-cta hover:bg-vamu-dark-pink-cta text-white":"bg-vamu-green text-white shadow-md shadow-vamu-green/20 scale-[1.02]")
                       : "text-vamu-gray-dark hover:text-vamu-dark hover:bg-black/5"
                   }`}
                   onClick={() => {
@@ -252,7 +254,7 @@ export default function SearchRideContainer() {
                   type="button"
                   className={`px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
                     tripType === "idavolta"
-                      ? "bg-vamu-green text-white shadow-md shadow-vamu-green/20 scale-[1.02]"
+                      ? checkUp?"bg-vamu-pink-cta hover:bg-vamu-dark-pink-cta text-white":"bg-vamu-green text-white shadow-md shadow-vamu-green/20 scale-[1.02]"
                       : "text-vamu-gray-dark hover:text-vamu-dark hover:bg-black/5"
                   }`}
                   onClick={() => {
@@ -274,7 +276,7 @@ export default function SearchRideContainer() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-vamu-green-cta hover:bg-vamu-green-dark text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-vamu-green/20"
+                  className={`${checkUp? "bg-vamu-pink-cta hover:bg-vamu-dark-pink-cta" : "bg-vamu-green-cta hover:bg-vamu-green-dark "} font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-vamu-green/20 text-white`}
                 >
                   Buscar
                 </button>

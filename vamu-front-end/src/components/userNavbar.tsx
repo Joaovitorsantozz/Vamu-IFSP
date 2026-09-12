@@ -10,8 +10,8 @@ export default function UserNavbar(){
             <img src={Logo} alt="VAMU Logo" className="w-8 h-8" />
           </div>
           <Link to="/dashboard">
-            <h1 className="text-xl md:text-[20px] font-bold text-vamu-dark">
-              Vamu
+            <h1 className="text-xl md:text-[20px] font-bold text-vamu-dark ">
+              Vamu 
             </h1>
           </Link>
         </div>

@@ -12,17 +12,18 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import RideFoundCard, { type Ride } from "../components/rideFoundCard";
-
+import { useState } from "react";
 import { useRideSearch } from "../context/rideSearchContext";
 
 export default function SearchRidePage() {
   const { rides, setRides } = useRideSearch();
+  const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <div className="min-h-screen bg-vamu-gray font-jakarta text-vamu-dark">
+    <div className={`min-h-screen  font-jakarta text-vamu-dark ${isChecked?  "bg-pink-200" : "bg-vamu-gray"}`}>
       <UserNavbar></UserNavbar>
-      <main className="max-w-7xl mx-auto pt-12 pb-1 px-2">
-        <SearchRideContainer></SearchRideContainer>
+      <main className="max-w-7xl mx-auto pt-12 pb-1 px-2  ">
+        <SearchRideContainer checkUp={isChecked}></SearchRideContainer>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           <aside className="bg-white rounded-3xl p-6 shadow-xl shadow-vamu-dark-deep/5 border border-vamu-border space-y-6">
             <h2 className="text-lg font-bold text-vamu-dark">Filtros</h2>
@@ -97,7 +98,7 @@ export default function SearchRidePage() {
               <label className="flex items-center gap-3 text-sm text-vamu-dark cursor-pointer">
                 <User className="w-4 h-4 text-vamu-gray-dark" />
                 <input
-                  type="checkbox"
+                  type="checkbox" checked= {isChecked} onChange = {(e) => setIsChecked(e.target.checked)}
                   className="w-4 h-4 rounded border-vamu-border text-vamu-green focus:ring-vamu-green"
                 />
                 <span>Apenas motoristas mulheres</span>

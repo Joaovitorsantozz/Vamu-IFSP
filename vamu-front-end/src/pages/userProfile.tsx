@@ -6,6 +6,8 @@ import Logo from "../assets/icons/logo1.png";
 import UserIcon from "../assets/icons/user.png";
 import BellNotification from "../assets/icons/bellnotifications.png";
 import { UserContext } from "../context/userContext";
+import DashFooter from "../components/dashFooter";
+import Footer from "../components/footer";
 function UserProf() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -446,14 +448,11 @@ function UserProf() {
         </Formik>
 
         <div className="pb-10"></div>
-
-        <footer className="p-4 bg-white w-full text-center font-light border-t-[1px] border-t-vamu-green mt-4">
-          <p>
-            © 2026 Vamu-Conectando estudantes para um futuro mais sustentável
-          </p>
-        </footer>
+          
       </section>
+      <DashFooter></DashFooter>
     </section>
+    
   );
 }
 
