@@ -18,13 +18,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SearchRidePage() {
   const { rides, setRides } = useRideSearch();
-<<<<<<< HEAD
-  const [isChecked, setIsChecked] = useState(false);
-=======
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
->>>>>>> feat/chat-carona
-
+  const [isChecked, setIsChecked] = useState(false);
   const selectedTimes = searchParams.get("time")?.split(",") || [];
 
   const handleTimeFilterChange = (timeKey: string) => {
@@ -47,7 +43,9 @@ export default function SearchRidePage() {
     navigate(`?${params.toString()}`, { replace: true });
   };
   return (
-    <div className={`min-h-screen  font-jakarta text-vamu-dark ${isChecked?  "bg-pink-200" : "bg-vamu-gray"}`}>
+    <div
+      className={`min-h-screen  font-jakarta text-vamu-dark ${isChecked ? "bg-pink-200" : "bg-vamu-gray"}`}
+    >
       <UserNavbar></UserNavbar>
       <main className="max-w-7xl mx-auto pt-12 pb-1 px-2  ">
         <SearchRideContainer checkUp={isChecked}></SearchRideContainer>
@@ -129,7 +127,9 @@ export default function SearchRidePage() {
               <label className="flex items-center gap-3 text-sm text-vamu-dark cursor-pointer">
                 <User className="w-4 h-4 text-vamu-gray-dark" />
                 <input
-                  type="checkbox" checked= {isChecked} onChange = {(e) => setIsChecked(e.target.checked)}
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={(e) => setIsChecked(e.target.checked)}
                   className="w-4 h-4 rounded border-vamu-border text-vamu-green focus:ring-vamu-green"
                 />
                 <span>Apenas motoristas mulheres</span>
