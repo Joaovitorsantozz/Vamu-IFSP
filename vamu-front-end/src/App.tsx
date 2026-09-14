@@ -12,6 +12,7 @@ import UserProf from "./pages/userProfile";
 import RidePage from "./pages/offerRidePage";
 import SearchRidePage from "./pages/searchRide";
 import { RideProvider } from "./context/rideSearchContext";
+import ChatCarona from "./pages/chatPage";
 
 function App() {
   return (
@@ -64,6 +65,16 @@ function App() {
               <SearchRidePage></SearchRidePage>
             </ProtectedRoute>
           </RideProvider>
+        }
+      ></Route>
+            <Route
+        path="/chat-page"
+        element={
+         
+            <ProtectedRoute>
+             <ChatCarona></ChatCarona>
+            </ProtectedRoute>
+         
         }
       ></Route>
     </Routes>

@@ -1,14 +1,9 @@
-import {
-
-  Car,
-  Clock,
-  ArrowRight,
-} from "lucide-react";
+import { Car, Clock, ArrowRight } from "lucide-react";
 import Logo from "../assets/icons/logo1.png";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
-import { getActiveRaces} from "../service/rideOfferService";
+import { getActiveRaces } from "../service/rideOfferService";
 import { RideCard } from "../components/ridecard";
 
 import UserNavbar from "../components/userNavbar";
@@ -21,14 +16,15 @@ type Ride = {
   boarding_time: string;
   is_active: boolean;
   passengers_count: number;
-  role:string;
+  role: string;
+  passenger_status: string;
 };
 const VamuDashboard = () => {
   const { car } = useContext(UserContext);
   const token = localStorage.getItem("token");
   const [activeRaces, setActiveRaces] = useState<Ride[]>([]);
 
-async function fetchData() {
+  async function fetchData() {
     try {
       if (!token) return;
       const response = await getActiveRaces(token);
@@ -60,7 +56,6 @@ async function fetchData() {
           </p>
         </section>
 
-     
         <SearchRideContainer></SearchRideContainer>
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">

@@ -13,6 +13,7 @@ type Ride = {
   is_active: boolean;
   passengers_count: number;
   role: string;
+  passenger_status: string;
 };
 
 export function RideCard({ ride, onUpdate }: RideCardProps) {
@@ -32,6 +33,9 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
       }
     }
   };
+  const isDriver = ride?.role === "MOTORISTA";
+  const status = ride?.passenger_status; // 'pending' | 'accepted' | 'rejected'
+
   return (
     <div className="bg-white p-6 rounded-2xl border border-vamu-border shadow-sm relative overflow-hidden">
       <div className="flex justify-between items-start mb-4">
@@ -39,9 +43,30 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
           VOCÊ É {ride.role}
         </span>
 
-        <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
-          {ride.is_active ? "ATIVA" : "INATIVA"}
-        </span>
+      
+        {isDriver ? (
+          <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
+            {ride.is_active ? "ATIVA" : "INATIVA"}
+          </span>
+        ) : (
+          <>
+            {status === "pending" && (
+              <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                Pendente
+              </span>
+            )}
+            {status === "accepted" && (
+              <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                Confirmada
+              </span>
+            )}
+            {status === "rejected" && (
+              <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                Recusada
+              </span>
+            )}
+          </>
+        )}
       </div>
 
       <div className="space-y-2 mb-5">
@@ -80,8 +105,9 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
           )}
         </div>
 
-        {ride.role === "MOTORISTA" ? (
-          <>
+      
+        {isDriver ? (
+          <div className="flex gap-2">
             <Link
               to={`/manage-ride/${ride.id}`}
               state={{ ride }}
@@ -97,9 +123,27 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
             >
               Excluir
             </button>
-          </>
+          </div>
         ) : (
-          <></>
+          <div className="flex gap-2">
+            {status === "accepted" && (
+              <Link
+                to = "/chat-page"
+                className="text-[11px] font-bold bg-vamu-green-cta text-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-vamu-green-dark transition"
+              >
+                Chat
+              </Link>
+            )}
+
+            {status === "pending" && (
+              <button
+                onClick={() => alert("Cancelar solicitação em breve...")}
+                className="text-[11px] font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-200 transition"
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
