@@ -16,7 +16,7 @@ interface SelectOption {
   label: string;
   value: string;
 }
-export default function SearchRideContainer( {checkUp} ) {
+export default function SearchRideContainer( {checkUp:any} ) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const timeFilter = searchParams.get("time");

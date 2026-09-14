@@ -65,7 +65,7 @@ const VamuDashboard = () => {
         </section>
 
      
-        <SearchRideContainer></SearchRideContainer>
+        <SearchRideContainer checkUp={undefined}></SearchRideContainer>
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="flex items-center gap-2 font-bold text-vamu-dark text-lg">
