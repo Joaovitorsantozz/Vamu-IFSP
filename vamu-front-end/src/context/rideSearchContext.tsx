@@ -10,6 +10,8 @@ export interface RideSearchInterface {
   setTripType: (type: "ida" | "idavolta") => void;
   rides: any[];
   setRides: React.Dispatch<React.SetStateAction<Ride[]>>;
+  date:string;
+  setDate:(date:string)=>void;
 }
 
 const RideSearchContext = createContext<RideSearchInterface>({} as RideSearchInterface);
@@ -19,7 +21,7 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   const [cityDestination, setCityDestination] = useState("");
   const [tripType, setTripType] = useState<"ida" | "idavolta">("idavolta");
   const [rides, setRides] = useState<any[]>([]);
-
+  const [date,setDate]=useState("");
   return (
     <RideSearchContext.Provider
       value={{
@@ -31,6 +33,8 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
         setTripType,
         rides,
         setRides,
+        date,
+        setDate
       }}
     >
       {children}

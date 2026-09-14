@@ -75,37 +75,46 @@ export async function getRideById(rideId: Number) {
 }
 
 export async function getActiveRacesService(userid: number) {
-  const query = `SELECT r.id,
-  r.user_id,r.boarding,
+  const query = `SELECT 
+  r.id,
+  r.user_id,
+  r.boarding,
   r.destination,
   r.boarding_time,
   r.is_active,
   r.available_seats,
-  'MOTORISTA' AS role,COUNT(p_count.id) FILTER (WHERE p_count.status='accepted') AS passenger_count,
+  'MOTORISTA' AS role,
+  'accepted' AS passenger_status, -- O motorista sempre tem status confirmado
+  COUNT(p_count.id) FILTER (WHERE p_count.status = 'accepted') AS passenger_count,
   r.city_destination,
-  r.city_boarding FROM offered_rides r 
-  LEFT JOIN ride_passengers p_count ON p_count.ride_id= r.id
-  WHERE r.user_id=$1 AND r.is_active=true
-  GROUP BY r.id
+  r.city_boarding 
+FROM offered_rides r 
+LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
+WHERE r.user_id = $1 AND r.is_active = true
+GROUP BY r.id
 
+UNION ALL
 
-  UNION ALL
-
-  SELECT r.id,
-  r.user_id,r.boarding,
+SELECT 
+  r.id,
+  r.user_id,
+  r.boarding,
   r.destination,
   r.boarding_time,
   r.is_active,
   r.available_seats,
   'PASSAGEIRO' AS role,
-  COUNT(p_count.id) FILTER (WHERE p_count.status='accepted') AS passenger_count,
+  p.status AS passenger_status, -- Retorna 'pending', 'accepted' ou 'rejected'
+  COUNT(p_count.id) FILTER (WHERE p_count.status = 'accepted') AS passenger_count,
   r.city_destination,
   r.city_boarding
-  FROM ride_passengers p 
-  JOIN offered_rides r ON  r.id=p.ride_id
-  LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
-  WHERE p.user_id= $1 AND p.status='accepted' AND r.is_active=true
-  GROUP BY r.id;
+FROM ride_passengers p 
+JOIN offered_rides r ON r.id = p.ride_id
+LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
+WHERE p.user_id = $1 
+  AND p.status IN ('pending', 'accepted') -- Mostra pendentes e aceitos (descarta rejeitados se quiser)
+  AND r.is_active = true
+GROUP BY r.id, p.status;
   `;
 
   const result = await pool.query(query, [userid]);
@@ -135,12 +144,66 @@ export async function updateRaceStatusService(
   console.log(result.rowCount);
   return result.rows[0];
 }
-export interface FilteredSearch {
+interface FilteredSearch {
   boarding?: string;
   destination?: string;
+  date?: string;
+  timeFilter?: string | string[];
 }
-export async function resultRidesServices(filter: FilteredSearch, passengerId?: number) {
-  const { destination, boarding } = filter;
+
+interface TimeRange {
+  start: string;
+  end: string;
+}
+
+const TIME_MAP: Record<string, TimeRange> = {
+  morning: { start: "06:00:00", end: "11:59:59" },
+  afternoon: { start: "12:00:00", end: "17:59:59" },
+  night: { start: "18:00:00", end: "23:59:59" },
+};
+
+export async function resultRidesServices(
+  filter: FilteredSearch,
+  passengerId?: number,
+) {
+  const { destination, boarding, date, timeFilter } = filter;
+
+  const rawTimes =
+    typeof timeFilter === "string"
+      ? timeFilter.split(",").map((t) => t.trim())
+      : Array.isArray(timeFilter)
+        ? timeFilter
+        : [];
+
+  const selectedRanges: TimeRange[] = rawTimes
+    .map((period) => TIME_MAP[period])
+    .filter(Boolean);
+
+  const cleanBoarding =
+    boarding && boarding.trim() !== "" ? boarding.trim() : null;
+  const cleanDestination =
+    destination && destination.trim() !== "" ? destination.trim() : null;
+  const cleanDate = date && date.trim() !== "" ? date.trim() : null;
+
+  const values: any[] = [
+    cleanBoarding,
+    cleanDestination,
+    passengerId ?? null,
+    cleanDate,
+  ];
+
+  let timeClause = "TRUE";
+
+  if (selectedRanges.length > 0) {
+    const conditions = selectedRanges.map((range) => {
+      values.push(range.start, range.end);
+      const startIdx = values.length - 1;
+      const endIdx = values.length;
+      return `(r.boarding_time::time BETWEEN $${startIdx} AND $${endIdx})`;
+    });
+
+    timeClause = `(${conditions.join(" OR ")})`;
+  }
 
   const query = `
     SELECT 
@@ -158,20 +221,15 @@ export async function resultRidesServices(filter: FilteredSearch, passengerId?: 
       AND r.available_seats > 0
       AND ($1::text IS NULL OR r.city_boarding ILIKE '%' || $1 || '%') 
       AND ($2::text IS NULL OR r.city_destination ILIKE '%' || $2 || '%')
-      -- Ignora caronas que o passageiro logado já solicitou/aceitou
       AND ($3::int IS NULL OR r.id NOT IN (
         SELECT ride_id 
         FROM ride_passengers 
         WHERE user_id = $3
       ))
+      AND ($4::date IS NULL OR r.boarding_time::date = $4::date)
+      AND ${timeClause}
     ORDER BY r.boarding_time ASC;
   `;
-
-  const cleanBoarding = boarding && boarding.trim() !== "" ? boarding.trim() : null;
-  const cleanDestination = destination && destination.trim() !== "" ? destination.trim() : null;
-
-  
-  const values = [cleanBoarding, cleanDestination, passengerId ?? null];
 
   const result = await pool.query(query, values);
   return result.rows;

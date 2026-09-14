@@ -1,39 +1,50 @@
 import { Formik, Form } from "formik";
 import { fetchBrazilianCities } from "../service/ibgeAPIcities";
 import AsyncSelect from "react-select/async";
-import {
-  MapPin,
-  GraduationCap,
-  Calendar,
-  Users,
-  VenetianMask,
-} from "lucide-react";
+import { MapPin, GraduationCap, Calendar, Users, X } from "lucide-react";
 import { searchRideService } from "../service/searchRideService";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useRideSearch } from "../context/rideSearchContext";
 
 interface FormValues {
   cityBoarding: string;
   cityDestination: string;
+  data: string;
+}
+interface SelectOption {
+  label: string;
+  value: string;
 }
 export default function SearchRideContainer( {checkUp} ) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  const timeFilter = searchParams.get("time");
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const handleContainerClick = () => {
+    if (dateInputRef.current) {
+      try {
+        dateInputRef.current.showPicker();
+      } catch {
+        dateInputRef.current.focus();
+      }
+    }
+  };
   const {
-    city_boarding,
-    city_destination,
     tripType,
     setTripType,
     setCityBoarding,
     setCityDestination,
     setRides,
+    setDate,
   } = useRideSearch();
   const boarding = searchParams.get("boarding") || "";
   const destination = searchParams.get("destination") || "";
+  const dateRide = searchParams.get("date") || "";
+
   const executeSearch = useCallback(
-    async (b: string, d: string) => {
+    async (b: string, d: string, date: string, timeFilter: string) => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
@@ -41,7 +52,9 @@ export default function SearchRideContainer( {checkUp} ) {
           token,
           b,
           tripType === "ida" ? "" : d,
-        );  
+          date,
+          timeFilter,
+        );
         setRides(response.data.rides);
       } catch (error) {
         console.log("erro ao buscar corridas", error);
@@ -50,25 +63,46 @@ export default function SearchRideContainer( {checkUp} ) {
     [tripType, setRides],
   );
 
-  useEffect(()=>{
-    if(boarding || destination){
-      if(setCityBoarding) setCityBoarding(boarding);
-      if(setCityDestination) setCityDestination(destination);
-      executeSearch(boarding,destination);
-    }
-  },[boarding,destination,setCityBoarding,setCityBoarding,executeSearch])
+  useEffect(() => {
+    if (boarding || destination || dateRide || timeFilter) {
+      if (setCityBoarding) setCityBoarding(boarding);
+      if (setCityDestination) setCityDestination(destination);
+      if (setDate) setDate(dateRide);
 
-  const handleSubmit= (values:FormValues)=>{
-    const params = new URLSearchParams();
-    if(values.cityBoarding) params.append("boarding",values.cityBoarding);
-    if(values.cityDestination)params.append("destination",values.cityDestination);
+      executeSearch(boarding, destination, dateRide, timeFilter || "");
+    }
+  }, [
+    boarding,
+    destination,
+    dateRide,
+    timeFilter,
+    setCityBoarding,
+    setCityDestination,
+    setDate,
+    executeSearch,
+  ]);
+
+  const handleSubmit = (values: FormValues) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (values.cityBoarding) params.set("boarding", values.cityBoarding);
+    else params.delete("boarding");
+
+    if (values.cityDestination && tripType !== "ida") {
+      params.set("destination", values.cityDestination);
+    } else {
+      params.delete("destination");
+    }
+
+    if (values.data) params.set("date", values.data);
+    else params.delete("date");
 
     if (setCityBoarding) setCityBoarding(values.cityBoarding);
     if (setCityDestination) setCityDestination(values.cityDestination);
-
+    if (setDate) setDate(values.data);
 
     navigate(`/result-rides?${params.toString()}`);
-  }
+  };
   const selectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
@@ -123,6 +157,7 @@ export default function SearchRideContainer( {checkUp} ) {
         initialValues={{
           cityBoarding: boarding,
           cityDestination: destination,
+          data: dateRide,
         }}
         enableReinitialize
         onSubmit={handleSubmit}
@@ -137,7 +172,7 @@ export default function SearchRideContainer( {checkUp} ) {
                 <div className="flex items-center bg-vamu-gray border border-vamu-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-vamu-green/20 transition">
                   <MapPin className={`${checkUp? "text-vamu-dark-pink":"text-vamu-green-dark"} w-5 h-5 mr-3 shrink-0`} />
                   <div className="w-full">
-                    <AsyncSelect
+                    <AsyncSelect<SelectOption>
                       name="cityBoarding"
                       isClearable
                       defaultOptions={false}
@@ -161,7 +196,7 @@ export default function SearchRideContainer( {checkUp} ) {
                             }
                           : null
                       }
-                      onChange={(option: any) =>
+                      onChange={(option) =>
                         setFieldValue(
                           "cityBoarding",
                           option ? option.value : "",
@@ -172,7 +207,6 @@ export default function SearchRideContainer( {checkUp} ) {
                 </div>
               </div>
 
-              {/* Input Destino */}
               <div className="relative">
                 <label className="text-xs font-bold text-vamu-gray-dark uppercase ml-1 mb-2 block">
                   Indo para
@@ -192,7 +226,7 @@ export default function SearchRideContainer( {checkUp} ) {
                     }`}
                   />
                   <div className="w-full">
-                    <AsyncSelect
+                    <AsyncSelect<SelectOption>
                       name="cityDestination"
                       isClearable
                       isDisabled={tripType === "ida"}
@@ -221,7 +255,7 @@ export default function SearchRideContainer( {checkUp} ) {
                             }
                           : null
                       }
-                      onChange={(option: any) =>
+                      onChange={(option) =>
                         setFieldValue(
                           "cityDestination",
                           option ? option.value : "",
@@ -233,7 +267,6 @@ export default function SearchRideContainer( {checkUp} ) {
               </div>
             </div>
 
-            {/* Controles e Submissão */}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex gap-2 p-1 bg-vamu-gray rounded-xl">
                 <button
@@ -266,10 +299,13 @@ export default function SearchRideContainer( {checkUp} ) {
               </div>
 
               <div className="flex items-center gap-4 flex-1 justify-end">
-                <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
-                  <Calendar className="w-4 h-4 text-vamu-gray-dark" />
-                  <span className="text-sm">Hoje, 24 de Outubro</span>
-                </div>
+                <CalendarBox
+                  handleContainerClick={handleContainerClick}
+                  dateInputRef={dateInputRef}
+                  setFieldValue={setFieldValue}
+                  values={values}
+                  setDate={setDate}
+                ></CalendarBox>
                 <div className="flex items-center gap-2 border border-vamu-border rounded-xl px-4 py-2.5 text-vamu-gray-dark bg-white">
                   <Users className="w-4 h-4 text-vamu-gray-dark" />
                   <span className="text-sm">1 passageiro</span>
@@ -288,3 +324,81 @@ export default function SearchRideContainer( {checkUp} ) {
     </section>
   );
 }
+interface CalendarBoxProps {
+  handleContainerClick: () => void;
+  dateInputRef: RefObject<HTMLInputElement | null>;
+  setFieldValue: (field: string, value: any) => void;
+  values: { data: string };
+  setDate?: (date: string) => void;
+}
+export const CalendarBox: React.FC<CalendarBoxProps> = ({
+  handleContainerClick,
+  dateInputRef,
+  setFieldValue,
+  values,
+  setDate,
+}) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const handleDateChange = (newDate: string) => {
+    setFieldValue("data", newDate);
+    if (setDate) setDate(newDate);
+
+    const params = new URLSearchParams(searchParams);
+    if (newDate) {
+      params.set("date", newDate);
+    } else {
+      params.delete("date");
+    }
+
+    navigate(`?${params.toString()}`, { replace: true });
+  };
+
+  return (
+    <div
+      onClick={handleContainerClick}
+      className="flex items-center gap-2.5 border border-vamu-border rounded-xl px-3.5 py-2.5 bg-white cursor-pointer hover:border-vamu-green/50 focus-within:ring-2 focus-within:ring-vamu-green/20 transition-all select-none group"
+    >
+      <Calendar className="w-4 h-4 text-vamu-gray-dark group-hover:text-vamu-green-dark transition-colors shrink-0" />
+
+      <div className="relative flex-1 flex items-center min-w-0">
+        <input
+          ref={dateInputRef}
+          type="date"
+          id="date"
+          name="date"
+          onChange={(e) => handleDateChange(e.target.value)}
+          value={values.data}
+          className={`text-sm bg-transparent outline-none cursor-pointer text-vamu-gray-dark w-full appearance-none [&::-webkit-calendar-picker-indicator]:hidden ${
+            !values.data ? "opacity-0 absolute inset-0 z-10" : "relative"
+          }`}
+        />
+
+        {!values.data && (
+          <span className="text-sm text-slate-400 font-normal truncate">
+            Todas as datas
+          </span>
+        )}
+      </div>
+
+      {values.data ? (
+        <button
+          type="button"
+          title="Buscar em qualquer data"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDateChange("");
+          }}
+          className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors p-1 rounded-lg shrink-0 -mr-1 z-20"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      ) : (
+        <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap bg-slate-100 group-hover:bg-vamu-green/10 group-hover:text-vamu-green-dark transition-colors px-2 py-0.5 rounded-md shrink-0">
+          Qualquer data
+        </span>
+      )}
+    </div>
+  );
+};
