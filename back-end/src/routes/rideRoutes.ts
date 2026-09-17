@@ -2,6 +2,7 @@ import express from "express";
 
 import { getDriverInformations, deleteRide, getRideByIdController, updateStatus, registerRide, getActiveRaces, resultRides } from "../controllers/rideController.js";
 import { AuthenticateToken } from "../middlewares/authenticateToken.js";
+import { getUserInformationById } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -15,4 +16,5 @@ router.get("/get-ride-by-id/:rideId",AuthenticateToken,getRideByIdController);
 router.delete("/delete-race/:rideId",AuthenticateToken,deleteRide);
 router.patch("/change-ride-status/:rideId",AuthenticateToken,updateStatus);
 router.get("/rides",AuthenticateToken,resultRides);
+router.get("/driver-review/:driver_id",AuthenticateToken,getUserInformationById);
 export default router;

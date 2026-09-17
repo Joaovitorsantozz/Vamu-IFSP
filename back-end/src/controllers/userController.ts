@@ -138,3 +138,18 @@ export async function getUserInformation(req: Request, res: Response) {
       .json({ message: "Erro ao obter informações do usuário", err });
   }
 }
+
+export async function getUserInformationById(req:Request,res:Response){
+  try{
+    const userId= (Number)(req.params.driver_id);
+    console.log("userID",userId);
+    if(!userId) return res.status(404).json({message:"ID inválido ou não fornecido"});
+    const userInformation = await getUserSerivce(userId); 
+
+    return res.status(200).json({userInformation});
+  }catch(error){
+    console.log(error);
+    return res.status(500).json({message:"Erro ao obter informações do usuário por ID"});
+
+  }
+}

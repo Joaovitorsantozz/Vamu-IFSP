@@ -7,6 +7,7 @@ interface RideCardProps {
 }
 type Ride = {
   id: number;
+  user_id:number;
   boarding: string;
   destination: string;
   boarding_time: string;
@@ -35,7 +36,7 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
   };
   const isDriver = ride?.role === "MOTORISTA";
   const status = ride?.passenger_status; // 'pending' | 'accepted' | 'rejected'
-
+  
   return (
     <div className="bg-white p-6 rounded-2xl border border-vamu-border shadow-sm relative overflow-hidden">
       <div className="flex justify-between items-start mb-4">
@@ -65,6 +66,7 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
                 Recusada
               </span>
             )}
+        
           </>
         )}
       </div>
@@ -125,7 +127,9 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
             </button>
           </div>
         ) : (
+              
           <div className="flex gap-2">
+            <Link className="text-[11px] font-bold bg-vamu-green-cta text-white px-3 py-1.5 rounded-lg shadow-sm hover:bg-vamu-green-dark transition" to={`/driver-review/${ride.user_id}`}>Ver Perfil Motorista</Link>
             {status === "accepted" && (
               <Link
                 to = "/chat-page"

@@ -18,8 +18,8 @@ import RideRecord from "../components/manage-ride/rideRecord";
 
 type Ride = {
   id: number;
+  user_id:number;
   boarding: string;
-
   destination: string;
   boarding_time: string;
   is_active: boolean;
@@ -42,6 +42,7 @@ const VamuDashboard = () => {
           ? response.data.result
           : [response.data.result],
       );
+      
     } catch (error) {
       console.log(error);
     }

@@ -13,6 +13,7 @@ import RidePage from "./pages/offerRidePage";
 import SearchRidePage from "./pages/searchRide";
 import { RideProvider } from "./context/rideSearchContext";
 import ChatCarona from "./pages/chatPage";
+import DriverReviewPage from "./pages/driverReviewPage";
 
 function App() {
   return (
@@ -67,14 +68,20 @@ function App() {
           </RideProvider>
         }
       ></Route>
-            <Route
+      <Route
         path="/chat-page"
         element={
-         
-            <ProtectedRoute>
-             <ChatCarona></ChatCarona>
-            </ProtectedRoute>
-         
+          <ProtectedRoute>
+            <ChatCarona></ChatCarona>
+          </ProtectedRoute>
+        }
+      ></Route>
+      <Route
+        path="/driver-review/:driver_id"
+        element={
+          <ProtectedRoute>
+            <DriverReviewPage></DriverReviewPage>
+          </ProtectedRoute>
         }
       ></Route>
     </Routes>
