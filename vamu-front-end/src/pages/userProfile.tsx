@@ -16,7 +16,7 @@ function UserProf() {
     async function getUser() {
       try {
         const token = localStorage.getItem("token");
-        console.log("oioiio",token);
+
         const [resUser, resCar] = await Promise.all([
           Axios.get("http://localhost:3000/user-information", {
             headers: { Authorization: `Bearer ${token}` },

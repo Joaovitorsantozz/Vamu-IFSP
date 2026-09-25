@@ -8,6 +8,7 @@ import {
 import { AuthenticateToken } from "../middlewares/authenticateToken.js";
 import {
   getCarInformation,
+  getDriverCarInformation,
   registerCarInformations,
 } from "../controllers/carController.js";
 
@@ -21,4 +22,5 @@ router.patch("/user-information", AuthenticateToken, registerAboutUser);
 router.patch("/register-car-information", AuthenticateToken,registerCarInformations,);
 router.get("/user-information", AuthenticateToken, getUserInformation);
 router.get("/car-information", AuthenticateToken, getCarInformation);
+router.get("/car-information/:driver_id", AuthenticateToken, getDriverCarInformation);
 export default router;

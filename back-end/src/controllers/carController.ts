@@ -49,3 +49,18 @@ export async function getCarInformation(req: Request, res: Response) {
       .json({ message: "Erro ao obter informações do carro", err });
   }
 }
+
+export async function getDriverCarInformation(req:Request, res:Response){
+  try{
+    const userID =(Number)(req.params.driver_id);
+    const result = await getCarInformationService(userID);
+     return res.status(200).json({
+      message: result
+        ? "Informações do carro obtidas com sucesso"
+        : "Usuário não possui carro cadastrado",
+      result: result || null,
+    });
+  }catch(error){
+    console.log("erro ao buscar informações do carro do motorista");
+  }
+}
