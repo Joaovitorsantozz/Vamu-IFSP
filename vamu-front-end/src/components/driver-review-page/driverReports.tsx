@@ -1,6 +1,20 @@
-import { Check } from "lucide-react";
+import { AlertTriangle, Check } from "lucide-react";
+import type { FeedbacksReviewsProps } from "../../types/feedbackInterface";
+interface DriverReportsProps {
 
-export default function DriverReports() {
+  feedbacks?: FeedbacksReviewsProps[];
+  total_rides : 50;
+}
+const REPORT_DESC_MAP: Record<number, string> = {
+  8: "Relatado pontualmente na portaria",
+  9: "Comunicação com antecedência reduzida",
+  10: "Desvio no trajeto sem aviso prévio",
+  11: "Conduta de direção na via",
+  12: "Padrão de limpeza do veículo",
+  13: "Comunicação prévia no aplicativo",
+};
+
+export default function DriverReports({ feedbacks = [], total_rides}: DriverReportsProps) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
       <div className="flex items-center justify-between mb-2">
@@ -24,73 +38,44 @@ export default function DriverReports() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-        {[
-          {
-            title: "Atraso no embarque",
-            desc: "Relatado pontualmente na portaria",
-            val: "5 de 148",
-            alert: true,
-          },
-          {
-            title: "Cancelou em cima da hora / sem motivo",
-            desc: "Comunicação com antecedência reduzida",
-            val: "3 de 148",
-            alert: true,
-          },
-          {
-            title: "Mudou o trajeto sem avisar",
-            desc: "Desvio no trajeto sem aviso prévio",
-            val: "1 de 148",
-            alert: false,
-          },
-          {
-            title: "Direção imprudente/perigosa",
-            desc: "Nenhuma queixa registrada",
-            val: "0 ocorrências",
-            ok: true,
-          },
-          {
-            title: "Veículo sem condições de higiene",
-            desc: "Padrão limpo verificado",
-            val: "0 ocorrências",
-            ok: true,
-          },
-          {
-            title: "Falta de resposta no chat",
-            desc: "Tempo de resposta médio: 3 min",
-            val: "0 ocorrências",
-            ok: true,
-          },
-        ].map((item, idx) => (
-          <div
-            key={idx}
-            className="bg-vamu-gray/30 rounded-xl p-3 border border-slate-200/70 flex items-center justify-between"
-          >
-            <div className="pr-2">
-              <div className="text-xs font-semibold text-vamu-dark">
-                {item.title}
+        {feedbacks.map((item) => {
+          const count = Number(item.total_count);
+          const isZeroOccurrences = count === 0;
+          const description = REPORT_DESC_MAP[item.tag_id] || "Métrica auditada pela comunidade";
+
+
+          const displayValue = isZeroOccurrences
+            ? "0 ocorrências"
+            : total_rides
+            ? `${count} de ${total_rides}`
+            : `${count} ${count === 1 ? 'relato' : 'relatos'}`;
+
+          return (
+            <div
+              key={item.tag_id}
+              className="bg-vamu-gray/30 rounded-xl p-3 border border-slate-200/70 flex items-center justify-between gap-2"
+            >
+              <div className="pr-2">
+                <div className="text-xs font-semibold text-vamu-dark">
+                  {item.label}
+                </div>
+                <div className="text-[10px] text-vamu-gray-dark">
+                  {description}
+                </div>
               </div>
-              <div className="text-[10px] text-vamu-gray-dark">
-                {item.desc}
-              </div>
+
+              {isZeroOccurrences ? (
+                <span className="text-[11px] font-semibold text-vamu-green-dark bg-vamu-green-light border border-vamu-green/20 px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1">
+                  <Check className="w-3 h-3 text-vamu-green" /> {displayValue}
+                </span>
+              ) : (
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200">
+                  <AlertTriangle className="w-3 h-3 text-amber-600" /> {displayValue}
+                </span>
+              )}
             </div>
-            {item.ok ? (
-              <span className="text-[11px] font-semibold text-vamu-green-dark bg-vamu-green-light border border-vamu-green/20 px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1">
-                <Check className="w-3 h-3 text-vamu-green" /> {item.val}
-              </span>
-            ) : (
-              <span
-                className={`text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${
-                  item.alert
-                    ? "bg-amber-50 text-amber-700 border border-amber-200"
-                    : "bg-vamu-gray text-vamu-dark"
-                }`}
-              >
-                {item.val}
-              </span>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -16,12 +16,37 @@ import DriverRatings from "../components/driver-review-page/driverRatings";
 import DriverReports from "../components/driver-review-page/driverReports";
 import DriverHeader from "../components/driver-review-page/driverReviewHeader";
 import DriverSafetyRules from "../components/driver-review-page/driverSafetyRules";
+import Axios from "axios";
+import type { RatingData } from "../types/rating";
+import type { FeedbackData } from "../types/feedbackInterface";
 
 export default function DriverReviewPage() {
   const { driver_id } = useParams<{ driver_id: string }>();
   const [driver, setDriver] = useState<DriverInformation>();
   const [driverCar, setDriverCar] = useState<DriverCar>();
+  const [feedbacks, setFeedbacks] = useState<FeedbackData | null>(null);
+  const [ratings, setRatings] = useState<RatingData>();
+  const user_id = driver_id;
+  const fetchReviews = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await Axios.get(
+        `http://localhost:3000/reviews/${user_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      console.log(response);
+      setRatings(response.data.ratings);
+      setFeedbacks(response.data.feedbacks);
+    } catch (error) {
+      console.error("Erro ao procurar avaliações:", error);
+    }
+  };
 
+  if (user_id) {
+    fetchReviews();
+  }
   useEffect(() => {
     if (!driver_id) return;
 
@@ -62,20 +87,17 @@ export default function DriverReviewPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-     
         <div className="lg:col-span-8 space-y-6">
           <DriverHeader driver={driver} driverCar={driverCar} />
-          <DriverRatings />
-          <DriverCompliments driverName={driver?.nome} />
-          <DriverReports />
+          <DriverRatings ratings={ratings} />
+          <DriverCompliments driverName={driver?.nome} feedbacks={feedbacks?.positive} />
+          <DriverReports feedbacks={feedbacks?.negative} total_rides={50}/>
         </div>
 
-       
         <div className="lg:col-span-4 space-y-6">
           <DriverNextRideCard driverName={driver?.nome} />
           <DriverSafetyRules />
 
-    
           <div className="space-y-3">
             <button className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200/80 text-xs text-vamu-gray-dark hover:text-rose-600 hover:border-rose-200 transition-colors cursor-pointer">
               <span className="flex items-center gap-2 font-medium">
