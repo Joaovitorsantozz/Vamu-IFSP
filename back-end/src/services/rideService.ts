@@ -215,8 +215,10 @@ export async function resultRidesServices(
       r.city_boarding, 
       r.city_destination, 
       r.boarding_time, 
-      r.available_seats
+      r.available_seats,
+      u.genero
     FROM offered_rides r 
+    JOIN users u ON u.id = r.user_id
     WHERE r.is_active = true 
       AND r.available_seats > 0
       AND ($1::text IS NULL OR r.city_boarding ILIKE '%' || $1 || '%') 

@@ -11,12 +11,12 @@ import dotenv from "dotenv";
 dotenv.config();
 export async function register(req: Request, res: Response) {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, gender} = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Campos faltando" });
     }
     const bpass = await bcrypt.hash(password, 10);
-    const result = await registerUser(name, email, bpass);
+    const result = await registerUser(name, email, bpass, gender);
     if (!result) {
       return res.status(400).json({
         message: "Usuário ja existe",

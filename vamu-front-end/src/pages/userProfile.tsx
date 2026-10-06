@@ -7,7 +7,7 @@ import UserIcon from "../assets/icons/user.png";
 import BellNotification from "../assets/icons/bellnotifications.png";
 import { UserContext } from "../context/userContext";
 import DashFooter from "../components/dashFooter";
-import Footer from "../components/footer";
+import UserNavbar from "../components/userNavbar";
 function UserProf() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -126,44 +126,22 @@ function UserProf() {
       );
     }
   }
+  
+   const OPCOES_GENERO = [
+  { value: "mulher_cis", label: "Mulher" },
+  { value: "mulher_trans", label: "Mulher Transgênero" },
+  { value: "homem_cis", label: "Homem"},
+  { value: "homem_trans", label: "Homem Transgênero" },
+  { value: "nao_binario", label: "Não-binário" },
+  { value: "outro", label: "Outro / Prefiro não especificar" }
+];
+
+  const generoEncontrado = OPCOES_GENERO.find(opcao => opcao.value === user?.genero);
+  const generoLegivel = generoEncontrado ? generoEncontrado.label : "Não informado";
 
   return (
     <section>
-      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-vamu-border">
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="VAMU Logo" className="w-8 h-8" />
-          <Link to="/dashboard">
-            <h1 className="text-xl md:text-[20px] font-bold text-vamu-dark">
-              Vamu
-            </h1>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-8 text-sm font-medium text-vamu-gray-dark">
-          <a href="#" className="hover:text-vamu-green-dark transition">
-            Minhas Caronas
-          </a>
-          <a href="#" className="hover:text-vamu-green-dark transition">
-            Oferecer Carona
-          </a>
-          <div className="flex items-center gap-3 pl-4 border-l border-vamu-border">
-            <div className="relative">
-              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-              <div className="w-8 h-8 bg-vamu-gray rounded-full flex items-center justify-center">
-                <img
-                  src={BellNotification}
-                  alt="Notificação"
-                  className="w-5 h-5"
-                />
-              </div>
-            </div>
-            <div className="w-8 h-8 border-2 border-vamu-green rounded-full flex items-center justify-center">
-              <img src={UserIcon} alt="Perfil" className="w-5 h-5" />
-            </div>
-          </div>
-        </div>
-      </nav>
-
+        <UserNavbar></UserNavbar>
       <section className="bg-vamu-gray-light2 min-h-screen flex flex-col items-center gap-8 pt-8 px-4">
         <header className="bg-white p-6 md:p-8 w-full max-w-5x1 flex flex-col md:w-7/10 md:flex-row md:gap-8 items-center rounded-md">
           <div className="relative">
@@ -238,6 +216,21 @@ function UserProf() {
                 readOnly
                 required
               />
+            </div>
+
+            <div className="flex flex-col w-full">
+              <label htmlFor="gender" className="capitalize font-[380]">
+                Gênero
+              </label>
+             <input
+              className="bg-vamu-green-light text-vamu-gray-medium mt-1 p-[.6rem] font-thin rounded-md hover:outline-0 focus:outline-0"
+              type="text"
+              name="gender_display" 
+              value={generoLegivel} 
+              id="gender"
+              readOnly
+              required
+            />
             </div>
           </div>
 

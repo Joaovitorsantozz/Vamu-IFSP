@@ -3,10 +3,10 @@ import { Field } from "formik";
 import usericon from "../../assets/icons/user.png";
 import emailicon from "../../assets/icons/email.png";
 import passwordicon from "../../assets/icons/password.png";
+import gendericon from "../../assets/icons/gender.png"
 import { Link} from "react-router-dom";
 
 function UserRegisterForm() {
- 
 
   return (
    <>
@@ -70,6 +70,34 @@ function UserRegisterForm() {
             />
           </div>
         </div>
+
+        {/* GÊNERO */}
+
+        <div className="w-full flex flex-col gap-2.5">
+          <label className="text-sm font-semibold text-[rgb(41,41,41)]">
+            Selecione seu gênero
+          </label>
+    
+          <div className="w-full h-[45px] flex rounded-[10px] border-2 border-[rgb(221,221,221)] bg-[rgb(248,248,248)] overflow-hidden">
+            <div className="w-12 md:w-[10%] h-full flex items-center justify-center shrink-0">
+              <img className="w-[20px] h-[20px] " src={gendericon}/>
+            </div>
+            <Field className="flex-1 h-full bg-[rgb(248,248,248)] border-none rounded-md outline-none text-sm invalid:text-gray-500" name = "gender" as="select"  required>
+              <option value="" disabled selected >Selecione seu gênero</option>
+              <option value="mulher_cis">Mulher</option>
+              <option value="mulher_trans">Mulher Transgênero</option>
+              <option value="homem_cis">Homem</option>
+              <option value="homem_trans">Homem Transgênero</option>
+              <option value="nao_binario">Não-binário</option>
+              <option value="outro">Outro / Prefiro não especificar</option>
+            </Field>
+          </div>  
+       
+
+          
+
+        </div>
+
 
         {/* BOTÃO */}
         <div className="w-full mt-5 text-center">

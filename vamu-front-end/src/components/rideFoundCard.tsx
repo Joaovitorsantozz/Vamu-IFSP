@@ -14,14 +14,16 @@ export interface Ride {
   owner_name?: string;
   price?: number | string;
   rating?: number | string;
+  genero?: string;
 }
 
 export interface RideCardProps {
   ride: Ride;
   onRideAccepted?: (rideId: number) => void;
+  checkUp : boolean;
 }
 
-export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
+export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCardProps) {
   const driverName = ride?.owner_name ?? "Motorista";
   const carModel = ride?.car_sign ? `Placa: ${ride.car_sign}` : "Veículo";
 
@@ -89,7 +91,8 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
           </div>
           <div
             className={`absolute -bottom-1 -right-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 border border-white shadow-sm ${
-              isFull ? "bg-vamu-dark" : "bg-vamu-green"
+              isFull ? "bg-vamu-dark" : (checkUp?"bg-vamu-dark-pink":"bg-vamu-green")
+              
             }`}
           >
             {formattedRating} <Star className="w-2.5 h-2.5 fill-current" />
@@ -170,7 +173,8 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
               Esgotado
             </span>
           ) : (
-            <span className="inline-block text-[10px] font-bold text-vamu-green-dark bg-vamu-green/10 px-2 py-0.5 rounded-full uppercase mt-2">
+            <span className={`inline-block text-[10px] font-bold  py-0.5 rounded-full uppercase mt-2 px-[0.25rem] ${checkUp ? "bg-vamu-pink-bg text-vamu-dark-pink" : "bg-vamu-green/10 text-vamu-green-dark"}`}>
+
               {availableSeats}{" "}
               {availableSeats === 1 ? "vaga restante" : "vagas restantes"}
             </span>
@@ -184,7 +188,9 @@ export default function RideFoundCard({ ride, onRideAccepted }: RideCardProps) {
           className={`font-bold text-sm px-6 py-3.5 rounded-xl transition-all shrink-0 ${
             isFull
               ? "bg-vamu-gray text-vamu-gray-dark font-semibold cursor-not-allowed"
-              : "bg-vamu-green-cta hover:bg-vamu-green-dark text-white shadow-md shadow-vamu-green/20 cursor-pointer active:scale-95"
+              : (checkUp?
+              "bg-vamu-pink-cta hover:bg-vamu-dark-pink-cta text-white shadow-md shadow-vamu-green/20 cursor-pointer active:scale-95" : "bg-vamu-green-cta hover:bg-vamu-green-dark text-white shadow-md shadow-vamu-green/20 cursor-pointer active:scale-95")
+
           }`}
         >
           {isFull ? "Esgotado" : "Reservar Vaga"}

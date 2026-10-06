@@ -20,7 +20,7 @@ function Register() {
   };
   return (
     <Formik
-      initialValues={{ name: "", email: "", password: "" }}
+      initialValues={{ name: "", email: "", password: "", gender:""}}
       onSubmit={handleSubmit}
       validationSchema={validateRegister}
     >
