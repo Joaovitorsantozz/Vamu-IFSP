@@ -24,6 +24,7 @@ export default function SearchRideContainer({
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const timeFilter = searchParams.get("time");
+  /*const timeFilter = searchParams.get("genero");*/
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   const handleContainerClick = () => {
@@ -303,7 +304,7 @@ export default function SearchRideContainer({
               </div>
 
               <div className="flex items-center gap-4 flex-1 justify-end">
-                <CalendarBox
+                <CalendarBox checkUp = {checkUp}
                   handleContainerClick={handleContainerClick}
                   dateInputRef={dateInputRef}
                   setFieldValue={setFieldValue}
@@ -334,6 +335,7 @@ interface CalendarBoxProps {
   setFieldValue: (field: string, value: any) => void;
   values: { data: string };
   setDate?: (date: string) => void;
+  checkUp: boolean;
 }
 export const CalendarBox: React.FC<CalendarBoxProps> = ({
   handleContainerClick,
@@ -341,6 +343,7 @@ export const CalendarBox: React.FC<CalendarBoxProps> = ({
   setFieldValue,
   values,
   setDate,
+  checkUp, 
 }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -361,10 +364,11 @@ export const CalendarBox: React.FC<CalendarBoxProps> = ({
 
   return (
     <div
-      onClick={handleContainerClick}
-      className="flex items-center gap-2.5 border border-vamu-border rounded-xl px-3.5 py-2.5 bg-white cursor-pointer hover:border-vamu-green/50 focus-within:ring-2 focus-within:ring-vamu-green/20 transition-all select-none group"
+        onClick={handleContainerClick}
+        className={`flex items-center gap-2.5 border border-vamu-border rounded-xl px-3.5 py-2.5 bg-white cursor-pointer  transition-all select-none focus-within:ring-2 group ${checkUp? "hover:border-vamu-pink-bg  focus-within:ring-vamu-pink-cta" : "hover:border-vamu-green/50  focus-within:ring-vamu-green/20"
+        }`}
     >
-      <Calendar className="w-4 h-4 text-vamu-gray-dark group-hover:text-vamu-green-dark transition-colors shrink-0" />
+      <Calendar className={`w-4 h-4 text-vamu-gray-dark group-hover: ${checkUp?"text-vamu-pink-cta":"text-vamu-green-dark"} transition-colors shrink-0`} />
 
       <div className="relative flex-1 flex items-center min-w-0">
         <input
@@ -399,7 +403,7 @@ export const CalendarBox: React.FC<CalendarBoxProps> = ({
           <X className="w-4 h-4" />
         </button>
       ) : (
-        <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap bg-slate-100 group-hover:bg-vamu-green/10 group-hover:text-vamu-green-dark transition-colors px-2 py-0.5 rounded-md shrink-0">
+        <span className={`text-[11px] text-slate-500 font-medium whitespace-nowrap bg-slate-100 ${checkUp?"group-hover:bg-vamu-pink-bg group-hover:text-vamu-dark-pink":"group-hover:bg-vamu-green/10 group-hover:text-vamu-green-dark"} transition-colors px-2 py-0.5 rounded-md shrink-0`}>
           Qualquer data
         </span>
       )}

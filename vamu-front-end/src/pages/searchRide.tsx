@@ -42,6 +42,10 @@ export default function SearchRidePage() {
 
     navigate(`?${params.toString()}`, { replace: true });
   };
+
+  const filteredRides = isChecked ? rides.filter(r=> r.genero === "mulher_cis" || r.genero === "mulher_trans") : rides;
+  
+
   return (
     <div
       className={`min-h-screen  font-jakarta text-vamu-dark ${isChecked ? "bg-pink-200" : "bg-vamu-gray"}`}
@@ -141,8 +145,8 @@ export default function SearchRidePage() {
             aria-label="Resultados da busca"
             className="lg:col-span-3 space-y-4"
           >
-            {rides.map((ridesi: Ride) => (
-              <RideFoundCard
+            {filteredRides.map((ridesi: Ride) => (
+              <RideFoundCard checkUp = {isChecked}
                 key={ridesi.id}
                 ride={ridesi}
                 onRideAccepted={(acceptedId) => {

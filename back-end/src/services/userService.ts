@@ -3,6 +3,7 @@ export async function registerUser(
   name: string,
   email: string,
   password: string,
+  gender: string,
 ) {
   const sql = "SELECT * FROM users WHERE email=$1";
   const { rows } = await pool.query(sql, [email]);
@@ -10,9 +11,9 @@ export async function registerUser(
     return null;
   }
   const sql2 =
-    "INSERT INTO users (nome,email,senha) VALUES ($1,$2,$3) RETURNING *";
+    "INSERT INTO users (nome,email,senha,genero) VALUES ($1,$2,$3,$4) RETURNING *";
 
-  const result = await pool.query(sql2, [name, email, password]);
+  const result = await pool.query(sql2, [name, email, password, gender]);
   return result.rows[0];
 }
 
