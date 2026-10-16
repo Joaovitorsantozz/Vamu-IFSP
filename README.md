@@ -64,7 +64,8 @@ A organização do back-end utiliza:
 # Telas
 
 ## DASHBOARD
-<img width="1897" height="1626" alt="image" src="https://github.com/user-attachments/assets/35fedd02-e184-414e-ae91-c48e3a228479" />
+<img width="1897" height="1626" alt="image" src="https://github.com/user-attachments/assets/a1e8cab2-0401-4358-b9e9-3203c2e2f872" />
+
 
 
 
