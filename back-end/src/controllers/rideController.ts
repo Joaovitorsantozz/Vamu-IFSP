@@ -4,12 +4,14 @@ import { getCarInformationService } from "../services/carService.js";
 import {
   deleteRaceService,
   getActiveRacesService,
+  getFinishedOrCancelledRacesService,
   getRideById,
   offerRide,
   resultRidesServices,
   updateRaceStatusService,
 } from "../services/rideService.js";
 import { getFilteredUserInformationService } from "../services/userService.js";
+import { NotificationService } from "../services/notificationService.js";
 
 export async function registerRide(req: Request, res: Response) {
   try {
@@ -70,6 +72,15 @@ export async function registerRide(req: Request, res: Response) {
       cityBoarding,
     );
 
+    await NotificationService.create({
+      userId: user.userId,
+      type: "RIDE_REGISTERED",
+      title: "Carona Registrada!",
+      message: `Sua carona de ${cityBoarding} para ${cityDestination} foi publicada com sucesso.`,
+      link: `${process.env.FRONTEND_URL}/manage-ride/${newRide.id}`,
+      metadata: { rideId: newRide.id },
+    });
+
     return res
       .status(201)
       .json({ message: "Carona registrada com sucesso", ride: newRide });
@@ -109,7 +120,28 @@ export async function getDriverInformations(req: Request, res: Response) {
       .json({ message: "Erro ao buscar informações do motorista" });
   }
 }
+export async function getFinishedRacesController(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.userId;
 
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado." });
+    }
+
+    const races = await getFinishedOrCancelledRacesService(userId);
+
+    return res.status(200).json({
+      success: true,
+      result: races,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar histórico de corridas:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Erro interno ao buscar o histórico de caronas.",
+    });
+  }
+}
 export async function getActiveRaces(req: Request, res: Response) {
   try {
     const userId = (req as any).user.userId;
@@ -164,25 +196,48 @@ export async function deleteRide(req: Request, res: Response) {
 
 export async function updateStatus(req: Request, res: Response) {
   try {
-    const ownerId = (req as any).user.userId;
-    const { userId } = req.body;
+    const ownerId = (req as any).user.userId; // ID do motorista (dono da carona)
+    const { userId, status } = req.body;
+    const passengerId = userId;
     const rideId = Number(req.params.rideId);
+
     if (!userId || !rideId)
       return res.status(404).json({ message: "Sem userid ou rideid" });
+
     const ride = await getRideById(rideId);
-    const { status } = req.body;
 
     if (Number(ride.user_id) !== Number(ownerId)) {
-      return res.status(403).json({ message: "Sem permissão para deletar" });
+      return res.status(403).json({ message: "Sem permissão para alterar" });
     }
 
-    if (status != "accepted" && status != "rejected") {
+    if (status !== "accepted" && status !== "rejected") {
       return res.status(400).json({ message: "Status não tolerado" });
     }
+
     await updateRaceStatusService(status, Number(rideId), Number(userId));
-    return res
-      .status(200)
-      .json({ message: "Status do passageiro atualizado com sucesso" });
+
+    if (status === "accepted") {
+      const passengerInfo = await getFilteredUserInformationService(
+        passengerId,
+        ["nome"],
+      );
+
+      await NotificationService.notifyRideAccepted({
+        passengerId: passengerId,
+        rideId: rideId,
+      });
+
+      await NotificationService.notifyDriverRideAccepted({
+        driverId: ownerId,
+        passengerId: passengerId,
+        passengerName: passengerInfo?.nome,
+        rideId: rideId,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Status do passageiro atualizado com sucesso",
+    });
   } catch (error) {
     console.log(error);
     return res
@@ -201,7 +256,7 @@ export async function resultRides(req: Request, res: Response) {
       destination: destination ? String(destination) : undefined,
       boarding: boarding ? String(boarding) : undefined,
       date: date ? String(date) : undefined,
-      timeFilter:timeFilter ? String ( timeFilter) : undefined
+      timeFilter: timeFilter ? String(timeFilter) : undefined,
     },
     userId,
   );

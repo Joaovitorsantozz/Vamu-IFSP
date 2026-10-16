@@ -81,16 +81,16 @@ export async function getActiveRacesService(userid: number) {
   r.boarding,
   r.destination,
   r.boarding_time,
-  r.is_active,
+  r.status,
   r.available_seats,
   'MOTORISTA' AS role,
-  'accepted' AS passenger_status, -- O motorista sempre tem status confirmado
+  'accepted' AS passenger_status, 
   COUNT(p_count.id) FILTER (WHERE p_count.status = 'accepted') AS passenger_count,
   r.city_destination,
   r.city_boarding 
 FROM offered_rides r 
 LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
-WHERE r.user_id = $1 AND r.is_active = true
+WHERE r.user_id = $1 AND r.status = 'active'
 GROUP BY r.id
 
 UNION ALL
@@ -101,7 +101,7 @@ SELECT
   r.boarding,
   r.destination,
   r.boarding_time,
-  r.is_active,
+  r.status,
   r.available_seats,
   'PASSAGEIRO' AS role,
   p.status AS passenger_status, -- Retorna 'pending', 'accepted' ou 'rejected'
@@ -113,21 +113,66 @@ JOIN offered_rides r ON r.id = p.ride_id
 LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
 WHERE p.user_id = $1 
   AND p.status IN ('pending', 'accepted') -- Mostra pendentes e aceitos (descarta rejeitados se quiser)
-  AND r.is_active = true
+  AND r.status = 'active'
 GROUP BY r.id, p.status;
   `;
 
   const result = await pool.query(query, [userid]);
   return result.rows;
 }
+export async function getFinishedOrCancelledRacesService(userid: number) {
+  const query = `SELECT 
+  r.id,
+  r.user_id,
+  r.boarding,
+  r.destination,
+  r.boarding_time,
+  r.status,
+  r.available_seats,
+  'MOTORISTA' AS role,
+  'accepted' AS passenger_status, 
+  COUNT(p_count.id) FILTER (WHERE p_count.status = 'accepted') AS passenger_count,
+  r.city_destination,
+  r.city_boarding 
+FROM offered_rides r 
+LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
+WHERE r.user_id = $1 AND r.status != 'active'
+GROUP BY r.id
 
+UNION ALL
+
+SELECT 
+  r.id,
+  r.user_id,
+  r.boarding,
+  r.destination,
+  r.boarding_time,
+  r.status,
+  r.available_seats,
+  'PASSAGEIRO' AS role,
+  p.status AS passenger_status,
+  COUNT(p_count.id) FILTER (WHERE p_count.status = 'accepted') AS passenger_count,
+  r.city_destination,
+  r.city_boarding
+FROM ride_passengers p 
+JOIN offered_rides r ON r.id = p.ride_id
+LEFT JOIN ride_passengers p_count ON p_count.ride_id = r.id
+WHERE p.user_id = $1 
+  AND p.status = 'accepted' -- Geralmente no histórico só entram as que ele participou de fato
+  AND r.status != 'active'
+GROUP BY r.id, p.status;
+  `;
+
+  const result = await pool.query(query, [userid]);
+  return result.rows;
+}
 export async function deleteRaceService(params: {
   rideId: number;
   userId: number;
 }) {
   const { rideId, userId } = params;
 
-  const query = `DELETE FROM offered_rides WHERE id=$1 AND user_id=$2`;
+  const query = `UPDATE offered_rides SET status='cancelled' WHERE id=$1 AND user_id=$2`;
   return await pool.query(query, [rideId, userId]);
 }
 
@@ -219,7 +264,7 @@ export async function resultRidesServices(
       u.genero
     FROM offered_rides r 
     JOIN users u ON u.id = r.user_id
-    WHERE r.is_active = true 
+    WHERE r.status = 'active'
       AND r.available_seats > 0
       AND ($1::text IS NULL OR r.city_boarding ILIKE '%' || $1 || '%') 
       AND ($2::text IS NULL OR r.city_destination ILIKE '%' || $2 || '%')

@@ -40,7 +40,7 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
   const availableSeats = ride?.available_seats ?? 0;
   const isFull = availableSeats <= 0;
 
-  // Trata a data e hora com fallback seguro
+
   const boarding_time = ride?.boarding_time ?? "";
   const dataObj = boarding_time ? new Date(boarding_time) : null;
   const isDateValid = dataObj && !isNaN(dataObj.getTime());
@@ -79,7 +79,7 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
         isFull ? "opacity-75" : ""
       }`}
     >
-      {/* 1. MOTORISTA */}
+    
       <div className="flex items-center gap-4 min-w-[200px]">
         <div className="relative shrink-0">
           <div className="w-16 h-16 rounded-full border border-vamu-border bg-vamu-gray p-0.5 flex items-center justify-center overflow-hidden">
@@ -109,10 +109,10 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
         </div>
       </div>
 
-      {/* 2. DATA / HORA E TRAJETO COMPLETO */}
+    
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 flex-1 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
         
-        {/* Bloco da Data e Hora */}
+     
         <div className="flex flex-col justify-center items-center sm:items-start sm:border-r border-slate-200 sm:pr-6 min-w-[110px]">
           <span className="text-[11px] font-semibold text-vamu-gray-dark uppercase tracking-wide">
             Saída
@@ -123,10 +123,10 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
           <span className="text-xs font-semibold text-slate-500">{dia}</span>
         </div>
 
-        {/* Linha do Trajeto (Cidades + Locais exatos) */}
+     
         <div className="flex-1 flex flex-col justify-center gap-3">
           
-          {/* Origem */}
+         
           <div className="flex items-start gap-2.5">
             <Circle className="w-3.5 h-3.5 text-vamu-green shrink-0 mt-0.5 fill-vamu-green/20" />
             <div className="flex flex-col min-w-0">
@@ -142,7 +142,7 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
             </div>
           </div>
 
-          {/* Destino */}
+        
           <div className="flex items-start gap-2.5">
             <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5 fill-rose-50" />
             <div className="flex flex-col min-w-0">
@@ -161,7 +161,7 @@ export default function RideFoundCard({ ride, onRideAccepted, checkUp}: RideCard
         </div>
       </div>
 
-      {/* 3. PREÇO E AÇÃO */}
+   
       <div className="flex items-center gap-5 border-t lg:border-t-0 lg:border-l border-vamu-border pt-4 lg:pt-0 lg:pl-6 justify-between lg:justify-end">
         <div className="text-left lg:text-right">
           <span className="text-2xl font-black text-vamu-dark block leading-none">

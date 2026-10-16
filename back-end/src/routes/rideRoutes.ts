@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getDriverInformations, deleteRide, getRideByIdController, updateStatus, registerRide, getActiveRaces, resultRides } from "../controllers/rideController.js";
+import { getDriverInformations, deleteRide, getRideByIdController, updateStatus, registerRide, getActiveRaces, resultRides, getFinishedRacesController } from "../controllers/rideController.js";
 import { AuthenticateToken } from "../middlewares/authenticateToken.js";
 import { getUserInformationById } from "../controllers/userController.js";
 
@@ -13,8 +13,9 @@ router.post("/offer-ride",AuthenticateToken,registerRide);
 router.get("/get-user-information-to-offer-ride",AuthenticateToken,getDriverInformations);
 router.get("/my-actives-races",AuthenticateToken,getActiveRaces);
 router.get("/get-ride-by-id/:rideId",AuthenticateToken,getRideByIdController);
-router.delete("/delete-race/:rideId",AuthenticateToken,deleteRide);
+router.patch("/delete-race/:rideId",AuthenticateToken,deleteRide);
 router.patch("/change-ride-status/:rideId",AuthenticateToken,updateStatus);
 router.get("/rides",AuthenticateToken,resultRides);
 router.get("/driver-review/:driver_id",AuthenticateToken,getUserInformationById);
+router.get("/rides-history",AuthenticateToken,getFinishedRacesController);
 export default router;

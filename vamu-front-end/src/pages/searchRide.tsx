@@ -15,6 +15,7 @@ import RideFoundCard, { type Ride } from "../components/rideFoundCard";
 import { useState } from "react";
 import { useRideSearch } from "../context/rideSearchContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import FWNavbar from "../components/FWNavbar";
 
 export default function SearchRidePage() {
   const { rides, setRides } = useRideSearch();
@@ -43,14 +44,18 @@ export default function SearchRidePage() {
     navigate(`?${params.toString()}`, { replace: true });
   };
 
-  const filteredRides = isChecked ? rides.filter(r=> r.genero === "mulher_cis" || r.genero === "mulher_trans") : rides;
-  
+  const filteredRides = isChecked
+    ? rides.filter(
+        (r) => r.genero === "mulher_cis" || r.genero === "mulher_trans",
+      )
+    : rides;
 
   return (
     <div
       className={`min-h-screen  font-jakarta text-vamu-dark ${isChecked ? "bg-pink-200" : "bg-vamu-gray"}`}
     >
-      <UserNavbar></UserNavbar>
+      {isChecked ? <FWNavbar /> : <UserNavbar></UserNavbar>}
+
       <main className="max-w-7xl mx-auto pt-12 pb-1 px-2  ">
         <SearchRideContainer checkUp={isChecked}></SearchRideContainer>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
@@ -146,7 +151,8 @@ export default function SearchRidePage() {
             className="lg:col-span-3 space-y-4"
           >
             {filteredRides.map((ridesi: Ride) => (
-              <RideFoundCard checkUp = {isChecked}
+              <RideFoundCard
+                checkUp={isChecked}
                 key={ridesi.id}
                 ride={ridesi}
                 onRideAccepted={(acceptedId) => {

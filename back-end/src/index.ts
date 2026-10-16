@@ -4,6 +4,7 @@ import userAuthRoutes from "./routes/userAuthRoutes.js";
 import rideRoutes from "./routes/rideRoutes.js";
 import passengerRoutes from "./routes/passengerRoute.js"
 import reviewRoutes from "./routes/reviewsRoutes.js"
+import notificationsRoute from './routes/notificationsRoute.js';
 const app=express();
 app.use(cors());
 app.use(express.json());
@@ -11,6 +12,7 @@ app.use(userAuthRoutes);
 app.use(rideRoutes);
 app.use(passengerRoutes);
 app.use(reviewRoutes);
+app.use(notificationsRoute);
 app.listen(3000,() => {
   console.log("Server init");
 });

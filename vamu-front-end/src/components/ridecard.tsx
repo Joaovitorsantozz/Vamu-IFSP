@@ -11,7 +11,7 @@ type Ride = {
   boarding: string;
   destination: string;
   boarding_time: string;
-  is_active: boolean;
+  status: string;
   passengers_count: number;
   role: string;
   passenger_status: string;
@@ -47,7 +47,7 @@ export function RideCard({ ride, onUpdate }: RideCardProps) {
       
         {isDriver ? (
           <span className="bg-vamu-green-light text-vamu-green-dark text-[10px] font-bold px-2 py-1 rounded">
-            {ride.is_active ? "ATIVA" : "INATIVA"}
+            {ride.status==="active" ? "ATIVA" : "INATIVA"}
           </span>
         ) : (
           <>

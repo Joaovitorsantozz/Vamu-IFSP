@@ -22,7 +22,7 @@ type Ride = {
   boarding: string;
   destination: string;
   boarding_time: string;
-  is_active: boolean;
+  status:string;
   passengers_count: number;
   role: string;
   passenger_status: string;

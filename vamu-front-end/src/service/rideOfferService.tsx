@@ -47,7 +47,7 @@ export const deleteRide = (raceid: number) => {
     alert("Usuário não autenticado");
     return;
   }
-  return Axios.delete(`${API_URL}/delete-race/${raceid}`, {
+  return Axios.patch(`${API_URL}/delete-race/${raceid}`,null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

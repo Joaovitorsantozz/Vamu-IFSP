@@ -9,15 +9,17 @@ import { RideHeader } from "../components/manage-ride/rideHeader";
 import { TripDetailsCard } from "../components/manage-ride/rideDetailsBox";
 import { TripMapCard } from "../components/manage-ride/tripMapCard";
 import { RideOccupancyCard } from "../components/manage-ride/rideOccupancyCard";
+
 type Ride = {
   available_seats: number;
   id: number;
   boarding: string;
   destination: string;
   boarding_time: string;
-  is_active: boolean;
+  status: string; 
   passengers_count: number;
 };
+
 type Passenger = {
   id: number;
   ride_id: number;
@@ -29,8 +31,10 @@ type Passenger = {
 export default function DriverManageRide() {
   const { rideid } = useParams();
   const location = useLocation();
-  const [ride, setRide] = useState<Ride | null>(location?.state.ride || null);
+
+  const [ride, setRide] = useState<Ride | null>(location?.state?.ride || null);
   const [passengers, setPassengers] = useState<Passenger[]>([]);
+  const [loading, setLoading] = useState<boolean>(!location?.state?.ride);
 
   async function refreshPassengersInRide() {
     try {
@@ -49,23 +53,29 @@ export default function DriverManageRide() {
       console.log("Erro ao buscar passageiros", e);
     }
   }
+
   async function refreshRideDetails() {
     try {
       const token = localStorage.getItem("token");
-
       if (!token || !rideid) return;
       const rideIdNumber = parseInt(rideid);
 
       const response = await getRideById(rideIdNumber);
 
-      if (!response) return alert("Nenhuma corrida encontrada");
+      if (!response) {
+        alert("Nenhuma corrida encontrada");
+        return;
+      }
 
       setRide(response.data.result);
     } catch (error) {
       alert("Erro ao buscar informações da carona");
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
+
   async function refreshAllData() {
     await Promise.all([refreshPassengersInRide(), refreshRideDetails()]);
   }
@@ -83,6 +93,7 @@ export default function DriverManageRide() {
 
     await refreshAllData();
   };
+
   useEffect(() => {
     refreshAllData();
     const interval = setInterval(() => {
@@ -104,16 +115,34 @@ export default function DriverManageRide() {
       minute: "2-digit",
     });
   };
-  if (!ride) return;
+
+  if (loading && !ride) {
+    return (
+      <div className="min-h-screen bg-vamu-gray flex items-center justify-center font-jakarta text-vamu-dark">
+        <p className="text-sm font-bold text-gray-500">Carregando detalhes da carona...</p>
+      </div>
+    );
+  }
+
+  if (!ride) {
+    return (
+      <div className="min-h-screen bg-vamu-gray flex items-center justify-center font-jakarta text-vamu-dark">
+        <p className="text-sm font-bold text-red-500">Carona não encontrada.</p>
+      </div>
+    );
+  }
+
   const pendingPassengers = passengers.filter((p) => p.status === "pending");
+
   return (
     <div className="min-h-screen bg-vamu-gray font-jakarta text-vamu-dark">
       <RideNavbar />
 
       <div className="p-8 bg-[#f5f6f7] min-h-screen">
-        <RideHeader isActive={ride.is_active} />
+       
+        <RideHeader isActive={ride.status === "active"} />
 
-        {/* TOP GRID */}
+       
         <div className="grid grid-cols-3 gap-6 mb-8">
           <TripDetailsCard
             ride={ride}
@@ -128,7 +157,6 @@ export default function DriverManageRide() {
           />
         </div>
 
-        {/* BOTTOM GRID */}
         <div className="grid grid-cols-[2fr_1fr] gap-6 items-start">
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -156,9 +184,8 @@ export default function DriverManageRide() {
             </div>
           </div>
 
-          {/* Ocupação e Confirmados */}
+          
           <RideOccupancyCard ride={ride} passengers={passengers} />
-              
         </div>
       </div>
     </div>
